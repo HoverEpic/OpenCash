@@ -1,0 +1,30 @@
+{
+  "name": "OpenCash",
+  "version": "1.0.0",
+  "repository": "",
+  "license": "MIT",
+  "description": "",
+  "keywords": [
+    "util",
+    "functional",
+    "server",
+    "client",
+    "browser"
+  ],
+  "author": "Epic",
+  "contributors": [],
+  "main": "server.js",
+  "scripts": {
+    "start": "node server/server.js"
+  },
+  "dependencies": {
+    "config": "^1.30.0",
+    "express": "^4.16.2",
+    "basic-auth": "^2.0.0",
+    "body-parser": "^1.18.2",
+    "helmet": "^3.12.1",
+    "mysql": "^2.15.0",
+    "ejs": "^2.6.1",
+    "xss": "^1.0.3"
+  }
+}
