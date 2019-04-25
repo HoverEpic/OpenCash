@@ -4,6 +4,7 @@
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
         <title>OpenCash - Caisse</title>
+        <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
         <style>
             .dropdown-submenu {
@@ -48,112 +49,104 @@
             <div class="row">
                 <div class="col-md-12">
                     <div class="row">
-                        <div class="col-md-4">
-                            <ul class="list-group">
+                        <div class="col-md-4" id="ticket">
+                            <ul class="list-group sortable">
                                 <li class="list-group-item active">
-                                    Ticket #1577 <span class="badge">4</span>
+                                    Ticket <span class="badge">0</span>
                                 </li>
-                                <li class="list-group-item">Dapibus (2€) <a href=""><span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></a></li>
-                                <li class="list-group-item">Morbi (3€) <a href=""><span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></a>
-                                <li class="list-group-item">Porta (17€) <a href=""><span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></a>
-                                <li class="list-group-item">Vestibulum (26€) <a href=""><span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></a>
-                                <li class="list-group-item list-group-item-success">Total : 48 €</li>
+                                <!--<li class="list-group-item ticket_item">Dapibus (2€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
+                                <li class="list-group-item">Morbi (3€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
+                                <li class="list-group-item">Porta (17€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
+                                <li class="list-group-item">Vestibulum (26€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>-->
+                                <li class="list-group-item list-group-item-success" id="total">Total : 0 €</li>
                             </ul>
                         </div>
                         <div class="col-md-4">
-                            <ul class="list-group">
+                            <ul class="list-group" id="item-prepare">
                                 <li class="list-group-item list-group-item-info">Vente</li>
                                 <li class="list-group-item">
                                     <div class="input-group">
-                                        <span class="input-group-addon" id="basic-addon1">Objet </span>
-                                        <input type="text" class="form-control" placeholder="Entrer un texte" aria-describedby="basic-addon1">
+                                        <span class="input-group-addon" id="basic-addonItem">Objet </span>
+                                        <input type="text" class="form-control" id="item_name" placeholder="Entrer un texte" aria-describedby="basic-addonItem">
+                                        <input type="hidden" id="item_id">
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon" id="basic-addon1">Nombre </span>
-                                        <input type="text" class="form-control" placeholder="1" aria-describedby="basic-addon1">
+                                        <span class="input-group-addon" id="basic-addonNumber">Nombre </span>
+                                        <input type="number" class="form-control" id="item_count" placeholder=1 aria-describedby="basic-addonNumber">
                                     </div>
                                     <br>
                                     <div class="input-group">
-                                        <span class="input-group-addon" id="basic-addon1">Prix </span>
-                                        <input type="text" class="form-control" placeholder="1" aria-describedby="basic-addon1">
+                                        <span class="input-group-addon" id="basic-addonPrice">Prix unitaire </span>
+                                        <input type="text" class="form-control" id="item_price" placeholder="1" aria-describedby="basic-addonPrice">
                                         <span class="input-group-addon"> €</span>
                                     </div>
                                     <br>
                                     <div class="row">
-                                        <div class="col-md-4 col-md-offset-4">
-                                            <button class="btn btn-default" type="submit">1</button>
-                                            <button class="btn btn-default" type="submit">2</button>
-                                            <button class="btn btn-default" type="submit">3</button><br>
-                                            <button class="btn btn-default" type="submit">4</button>
-                                            <button class="btn btn-default" type="submit">5</button>
-                                            <button class="btn btn-default" type="submit">6</button><br>
-                                            <button class="btn btn-default" type="submit">7</button>
-                                            <button class="btn btn-default" type="submit">8</button>
-                                            <button class="btn btn-default" type="submit">9</button><br>
-                                            <button class="btn btn-default" type="submit">0</button>
-                                            <button class="btn btn-default" type="submit">&nbsp.</button>
+                                        <div class="col-md-4 col-md-offset-4" id="numeric-pad">
+                                            <button class="btn btn-default" type="submit" value="1">1</button>
+                                            <button class="btn btn-default" type="submit" value="2">2</button>
+                                            <button class="btn btn-default" type="submit" value="3">3</button><br>
+                                            <button class="btn btn-default" type="submit" value="4">4</button>
+                                            <button class="btn btn-default" type="submit" value="5">5</button>
+                                            <button class="btn btn-default" type="submit" value="6">6</button><br>
+                                            <button class="btn btn-default" type="submit" value="7">7</button>
+                                            <button class="btn btn-default" type="submit" value="8">8</button>
+                                            <button class="btn btn-default" type="submit" value="9">9</button><br>
+                                            <button class="btn btn-default" type="submit" value="0">0</button>
+                                            <button class="btn btn-default" type="submit" value=".">&nbsp,</button>
+                                            <button class="btn btn-default" type="submit" value="C">c</button>
                                         </div>
                                     </div>
-                                    <button class="btn btn-default" type="submit">Ajouter au ticket</button>
+                                    <button class="btn btn-default" id="add_to_ticket">Ajouter au ticket</button>
                                 </li>
                             </ul>
                         </div>
                         <div class="col-md-4">
-                            <!--<div class="list-group"><ul>
-                                    <li class="list-group-item list-group-item-warning">Objets</li>
-                                    <li class="list-group-item">
-                                        <span class="label label-default">Boucles d'oreilles</span>
-                                        <span class="label label-default">Lampe</span>
-                                        <span class="label label-default">Tableau</span>
-                                        <span class="label label-default">Sac à vrac</span>
-                                        <span class="label label-default">Dessous de plat</span>
-                                        <span class="label label-default">Bracelet</span>
-                                        <span class="label label-default">Ceinture</span>
-                                        <span class="label label-default">Démaquillettes</span>
-                                    </li></ul>
-                            </div>-->
-                            <div class="list-group"><ul>
+                            <div class="list-group" id="stock">
+                                <ul>
                                     <li class="list-group-item list-group-item-warning">Objets</li>
                                     <li class="list-group-item">
                                         <div class="dropdown" style="display: inline">
-                                            <button class="btn btn-xs btn-default dropdown-toggle" type="button" data-toggle="dropdown">Boucles d'oreilles
-                                                <span class="caret"></span></button>
+                                            <!-- Category -->
+                                            <button class="btn btn-xs btn-default dropdown-toggle item_category" type="button" data-toggle="dropdown">
+                                                Boucles d'oreilles <span class="caret"></span> <!-- -->
+                                            </button>
                                             <ul class="dropdown-menu">
+                                                <!-- Sub Category -->
                                                 <li class="dropdown-submenu">
                                                     <a class="test" tabindex="-1" href="#">Simples <span class="caret"></span></a>
+                                                    <!-- Items -->
                                                     <ul class="dropdown-menu">
-                                                        <li><a href="#">Plumes</a></li>
-                                                        <li><a href="#">Plumetis</a></li>
-                                                        <li><a href="#">Geometriques</a></li>
+                                                        <li class="item" item_id="1" item_price="7" item_name="Boucles d'oreilles / Simples / Plumes"><a href="#">Plumes</a></li>
+                                                        <li class="item" item_id="2"  item_price="8" item_name="Boucles d'oreilles / Simples / Plumetis"><a href="#">Plumetis</a></li>
+                                                        <li class="item" item_id="3"  item_price="9" item_name="Boucles d'oreilles / Simples / Geometriques"><a href="#">Geometriques</a></li>
                                                     </ul>
                                                 </li>
+                                                <!-- Sub Category -->
                                                 <li class="dropdown-submenu">
                                                     <a class="test" tabindex="-1" href="#">Doubles <span class="caret"></span></a>
+                                                    <!-- Items -->
                                                     <ul class="dropdown-menu">
                                                         <li><a href="#">Plumes</a></li>
                                                         <li><a href="#">Plumetis</a></li>
                                                         <li><a href="#">Geometriques</a></li>
                                                     </ul>
                                                 </li>
+                                                <!-- Sub Category -->
                                                 <li class="dropdown-submenu">
                                                     <a class="test" tabindex="-1" href="#">Triples <span class="caret"></span></a>
+                                                    <!-- Items -->
                                                     <ul class="dropdown-menu">
                                                         <li><a href="#">Plumes</a></li>
                                                         <li><a href="#">Plumetis</a></li>
-                                                        <li><a href="#">Geometriques</a></li>
+                                                        <li class="disabled"><a href="#">Geometriques</a></li>
                                                     </ul>
                                                 </li>
                                             </ul>
                                         </div>
-                                        <span class="label label-default">Lampe</span>
-                                        <span class="label label-default">Tableau</span>
-                                        <span class="label label-default">Sac à vrac</span>
-                                        <span class="label label-default">Dessous de plat</span>
-                                        <span class="label label-default">Bracelet</span>
-                                        <span class="label label-default">Ceinture</span>
-                                        <span class="label label-default">Démaquillettes</span>
-                                    </li></ul>
+                                    </li>
+                                </ul>
                             </div>
                         </div>
                     </div>
@@ -161,19 +154,20 @@
                         <div class="col-md-4">
                             <div class="panel panel-default">
                                 <div class="panel-heading">Mode de paiement</div>
-                                <div class="panel-body">
+                                <div class="panel-body" id="payement_methods">
                                     <div class="btn-group" data-toggle="buttons">
                                         <label class="btn btn-primary active">
-                                            <input type="radio" name="options" id="option1" autocomplete="off" checked> Espèces
+                                            <input type="radio" name="options" id="cash" autocomplete="off" checked> Espèces
                                         </label>
                                         <label class="btn btn-info">
-                                            <input type="radio" name="options" id="option2" autocomplete="off"> Chèque
+                                            <input type="radio" name="options" id="check" autocomplete="off"> Chèque
                                         </label>
                                         <label class="btn btn-warning">
-                                            <input type="radio" name="options" id="option3" autocomplete="off"> Carte bleue
+                                            <input type="radio" name="options" id="card" autocomplete="off"> Carte bleue
                                         </label>
                                     </div>
-                                    <button type="button" class="btn btn-success pull-right">Encaisser</button>
+                                    <button type="button" class="btn btn-success pull-right" id="pay">Encaisser</button>
+                                    <button type="button" class="btn btn-danger pull-right" id="new_ticket" style="display: none">Nouveau ticket</button>
                                 </div>
                             </div>
                         </div>
@@ -193,8 +187,10 @@
                     </div>
                 </div>
             </div>
-            <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+            <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+            <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+            <!-- Stock modal -->
             <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
@@ -205,7 +201,7 @@
                         <div class="modal-body">
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs" role="tablist">
-                                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Par catégories</a></li>
+                                <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Par catégories <span id="add_itemcat" title="Ajouter" class="glyphicon glyphicon-plus"></span></a></li>
                                 <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Tous les objets</a></li>
                             </ul>
                             <br>
@@ -214,28 +210,20 @@
                             <div class="tab-content">
                                 <div role="tabpanel" class="tab-pane active" id="home">
                                     <div class="row">
-                                        <!--<div class="col-md-4">
-                                            <ul class="list-group">
-                                                <li class="list-group-item">Clotilde</li>
-                                                <li class="list-group-item">Alex</li>
-                                                <li class="list-group-item">Élise</li>
-                                                <li class="list-group-item">Charlène</li>
-                                            </ul>
-                                        </div>-->
-                                        <div class="col-md-4">
-                                            <ul class="list-group">
-                                                <li class="list-group-item">Boucles d'oreilles <span title="Editer" class="glyphicon glyphicon-pencil"></span> <span class="badge">3</span></li>
+                                        <div class="col-md-4 ">
+                                            <ul class="list-group sortable">
+                                                <li class="list-group-item">Boucles d'oreilles <span title="Editer" class="glyphicon glyphicon-pencil edit_itemcat"></span> <span id="add_itemcat" title="Ajouter" class="glyphicon glyphicon-plus"></span> <span class="badge">3</span></li>
                                             </ul>
                                         </div>
                                         <div class="col-md-4">
-                                            <ul class="list-group">
-                                                <li class="list-group-item">Simples <span data-toggle="modal" data-target="#itemsModal" title="Editer" class="glyphicon glyphicon-pencil"></span> <span class="badge">3</span></li>
+                                            <ul class="list-group sortable">
+                                                <li class="list-group-item">Simples <span data-toggle="modal" data-target="#itemsModal" title="Editer" class="glyphicon glyphicon-pencil"></span> <span id="add_itemcat" title="Ajouter" class="glyphicon glyphicon-plus"></span> <span class="badge">3</span></li>
                                                 <li class="list-group-item">Doubles</li>
                                                 <li class="list-group-item">Triples</li>
                                             </ul>
                                         </div>
                                         <div class="col-md-4">
-                                            <ul class="list-group">
+                                            <ul class="list-group sortable">
                                                 <li class="list-group-item" data-toggle="modal" data-target="#itemsModal">Plumes <span title="Editer" class="glyphicon glyphicon-pencil"></span> <span class="badge">5</span></li>
                                                 <li class="list-group-item">Plumetis <span class="badge">5</span></li>
                                                 <li class="list-group-item">Géometriques <span class="badge">5</span></li>
@@ -259,9 +247,10 @@
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary">Save changes</button>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                    </div>
+                </div>
+            </div>
+            <!-- Items modal -->
             <div class="modal fade" tabindex="-1" role="dialog" id="itemsModal">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -270,57 +259,56 @@
                             <h4 class="modal-title">Edition</h4>
                         </div>
                         <div class="modal-body">
-                            <p>Configuration d'un enfant de la catégorie Boucles d'oreilles</p>
-                            <div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Nom</label>
-                                    <input type="text" class="form-control" id="exampleInputEmail1" placeholder="Nom" value="Simples">
+                            <div class="form-group">
+                                <label for="exampleInputName">Nom</label>
+                                <input type="text" class="form-control" id="exampleInputName">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputFile">Personne</label>
+                                <select class="form-control">
+                                    <option>Clotilde</option>
+                                    <option>Alex</option>
+                                    <option>Élise</option>
+                                    <option>Charlène</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputPassword1">Type</label>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
+                                        Catégorie
+                                    </label>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputFile">Personne</label>
-                                    <select class="form-control">
-                                        <option>Clotilde</option>
-                                        <option>Alex</option>
-                                        <option>Élise</option>
-                                        <option>Charlène</option>
-                                    </select>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
+                                        Objet
+                                    </label>
                                 </div>
-                                <div class="form-group">
-                                    <label for="exampleInputPassword1">Type</label>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-                                            Catégorie
-                                        </label>
-                                    </div>
-                                    <div class="radio">
-                                        <label>
-                                            <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                            Objet
-                                        </label>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputFile">Couleur</label>
-                                    <input type="text" class="form-control" id="1" placeholder="#FFFFFF">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Prix (indicatif)</label>
-                                    <input type="number" class="form-control" id="1" placeholder="Prix">
-                                </div>
-                                <div class="form-group">
-                                    <label for="exampleInputEmail1">Nombre</label>
-                                    <input type="number" class="form-control" id="1" placeholder="1">
-                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputFile">Couleur</label>
+                                <input type="text" class="form-control" id="1" placeholder="#FFFFFF">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Prix (indicatif)</label>
+                                <input type="number" class="form-control" id="1" placeholder="Prix">
+                            </div>
+                            <div class="form-group">
+                                <label for="exampleInputEmail1">Nombre</label>
+                                <input type="number" class="form-control" id="1" placeholder="1">
                             </div>
                         </div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Supprimer</button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary">Save changes</button>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                    </div>
+                </div>
+            </div>
+            <!-- People modal -->
             <div class="modal fade" tabindex="-1" role="dialog" id="personnesModal">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
@@ -344,21 +332,203 @@
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary">Save changes</button>
                         </div>
-                    </div><!-- /.modal-content -->
-                </div><!-- /.modal-dialog -->
-            </div><!-- /.modal -->
+                    </div>
+                </div>
+            </div>
         </div>
+        <!-- Javascript -->
         <script>
-            var selected = [];
+            var lastInputField = $('#item-prepare #item_count'); //default to count
+            var itemTicketCount = 0;
+            var totalTicketPrice = 0;
+            var ticketItem = 0;
 
             $(document).ready(function () {
                 console.log("ready!");
+
+                // sorting ticket items or catégories/items
+                $(".sortable").sortable();
+                $(".sortable").disableSelection();
+
+                // numeric pad
+                $('#item-prepare #item_count').on("click", function (e) {
+                    lastInputField = $(this);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+                $('#item-prepare #item_price').on("click", function (e) {
+                    lastInputField = $(this);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+                $('#numeric-pad button').on("click", function (e) {
+                    var char = $(this).val();
+                    if (char === "C")
+                        lastInputField.val('');
+                    else
+                        lastInputField.val(lastInputField.val() + char);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
+                // add to ticket
+                $('#add_to_ticket').on("click", function (e) {
+                    var name = $('#item-prepare #item_name').val();
+                    var id = $('#item-prepare #item_id').val();
+                    var count = $('#item-prepare #item_count').val();
+                    var price = $('#item-prepare #item_price').val();
+                    // count check
+                    if (count === "")
+                        count = 1;
+                    if (price === "")
+                        price = 1;
+                    count = parseInt(count, 10);
+                    price = parseFloat(price);
+                    if (name === "") {
+                        alert("Pas de nom défini !");
+                        return;
+                    }
+                    itemTicketCount += count;
+                    var tprice = price * count;
+                    totalTicketPrice += tprice;
+                    var countDisplay = count > 1 ? ' x' + count : "";
+                    var line = '<li class="list-group-item ticket_item" id="ticketItem-' + ticketItem + '" item_price="' + price + '" total_price="' + tprice + '" item_count="' + count + '" item_id="' + id + '" item_name="' + name + '">' + name + countDisplay + ' (' + tprice + '€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>';
+                    //remove total line
+                    $('#ticket #total').remove();
+                    // add item line
+                    $('#ticket ul').append(line);
+                    // register event for added item
+                    $('#ticket #ticketItem-' + ticketItem + ' .glyphicon').on('click', function (e) {
+                        //update total
+                        var removePrice = $(this).parent('li').attr('total_price');
+                        var removeCount = $(this).parent('li').attr('item_count');
+                        // remove from ticket
+                        itemTicketCount -= removeCount;
+                        $('#ticket .badge').html(itemTicketCount);
+                        totalTicketPrice -= removePrice;
+                        $('#ticket #total').remove();
+                        $('#ticket ul').append('<li class="list-group-item list-group-item-success" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                        $(this).parent('li').remove();
+                        $('#ticket #ticketItem-' + ticketItem + ' .glyphicon').off();
+                        e.stopPropagation();
+                        e.preventDefault();
+                    });
+                    ticketItem++;
+                    //update count and total
+                    $('#ticket .badge').html(itemTicketCount);
+                    //update total
+                    $('#ticket ul').append('<li class="list-group-item list-group-item-success" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+                // remove from ticket (TODO REMOVE)
+                //$('#ticket .glyphicon').on("click", function (e) {
+                //    itemTicketCount--;//update count and total
+                //    $('#ticket .badge').html(itemTicketCount);
+                //    $(this).parent('li').remove();
+                //    e.stopPropagation();
+                //    e.preventDefault();
+                //});
+
+                // item prepare
+                $('#stock .item').on("click", function (e) {
+                    var itemPrice = $(this).attr('item_price');
+                    var itemName = $(this).attr('item_name');
+                    var itemCount = $(this).attr('item_count');
+                    var itemId = $(this).attr('item_id');
+                    $('#item-prepare #item_name').val(itemName);
+                    $('#item-prepare #item_count').val(itemCount);
+                    $('#item-prepare #item_price').val(itemPrice);
+                    $('#item-prepare #item_id').val(itemId);
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
                 // dropdown hack
+                var lastStockDropdown = null;
                 $('.dropdown-submenu a.test').on("click", function (e) {
+                    if (lastStockDropdown !== null)
+                        lastStockDropdown.toggle(); // close last dropdown if not closed
+                    lastStockDropdown = $(this).next('ul');
                     $(this).next('ul').toggle();
                     e.stopPropagation();
                     e.preventDefault();
                 });
+
+                $('#pay').on("click", function (e) {
+                    //checks
+                    console.log("valide ticket :");
+                    $('.ticket_item').each(function (i, obj) {
+                        var id = $(this).attr('item_id');
+                        var name = $(this).attr('item_name');
+                        var count = $(this).attr('item_count');
+                        var price = $(this).attr('item_price');
+                        var tprice = $(this).attr('total_price');
+                        console.log("- " + name + "(id:" + id + "), " + count + " x " + price + " € (" + tprice + ")");
+                    });
+                    console.log("Articles : " + itemTicketCount);
+                    console.log("Total : " + totalTicketPrice + " €");
+
+                    // post data
+
+                    //disable modification
+                    $(".sortable").sortable("disable");
+                    $('#ticket .glyphicon').hide();
+                    $('#item-prepare #add_to_ticket').attr('disabled', true);
+                    $('#stock .item_category').attr('disabled', true);
+                    $('#payement_methods #pay').hide();
+                    $('#payement_methods #new_ticket').show();
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
+                $('#new_ticket').on("click", function (e) {
+                    //empty ticket
+                    itemTicketCount = 0;
+                    $('#ticket .badge').html(itemTicketCount);
+                    totalTicketPrice = 0;
+                    $('#ticket .ticket_item').remove();
+                    $('#ticket #total').remove();
+                    $('#ticket ul').append('<li class="list-group-item list-group-item-success" id="total">Total : ' + totalTicketPrice + ' €</li>');
+
+                    //enable modification
+                    $(".sortable").sortable("enable");
+                    $('#ticket .glyphicon').show();
+                    $('#item-prepare #add_to_ticket').attr('disabled', false);
+                    $('#stock .item_category').attr('disabled', false);
+                    $('#payement_methods #new_ticket').hide();
+                    $('#payement_methods #pay').show();
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
+                $('#add_itemcat').on("click", function (e) {
+                    $("#itemsModal .modal-title").html("Ajout d'une catégorie ou d'un objet");
+                    $("#itemsModal #exampleInputName").val('');
+                    //populate people + select
+                    //
+                    $("#itemsModal").modal('show');
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
+                $('.edit_itemcat').on("click", function (e) {
+                    var itemCatId = 000;
+                    var itemCatName = 000;
+                    var itemCatPeople = 000;
+                    var itemCatType = 000;
+                    var itemCatColor = 000;
+                    var itemCatPrice = 000;
+                    var itemCatCount = 000;
+                    $("#itemsModal .modal-title").html("Edition d'une catégorie ou d'un objet");
+                    $("#itemsModal #exampleInputName").val('');
+                    //populate people + select
+                    $("#itemsModal #exampleInputName").val('');
+                    $("#itemsModal").modal('show');
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+
             });
             function debug(something)
             {
