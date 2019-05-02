@@ -97,8 +97,11 @@
                                             <button class="btn btn-default" type="submit" value=".">&nbsp,</button>
                                             <button class="btn btn-default" type="submit" value="C">c</button>
                                         </div>
+                                        <div class="col-md-6">
+                                            <button class="btn btn-default btn-primary btn-lg" id="add_to_ticket">Ajouter au ticket</button>
+                                            <button class="btn btn-default btn-warning btn-lg" id="reset">RAZ</button>
+                                        </div>
                                     </div>
-                                    <button class="btn btn-default" id="add_to_ticket">Ajouter au ticket</button>
                                 </li>
                             </ul>
                         </div>
@@ -200,13 +203,13 @@
                                 <div class="panel-heading">Mode de paiement</div>
                                 <div class="panel-body" id="payement_methods">
                                     <div class="btn-group" data-toggle="buttons">
-                                        <label class="btn btn-primary active">
+                                        <label class="btn btn-primary">
                                             <input type="radio" name="options" id="cash" autocomplete="off" checked> Espèces
                                         </label>
                                         <label class="btn btn-info">
                                             <input type="radio" name="options" id="check" autocomplete="off"> Chèque
                                         </label>
-                                        <label class="btn btn-warning">
+                                        <label class="btn btn-success">
                                             <input type="radio" name="options" id="card" autocomplete="off"> Carte bleue
                                         </label>
                                     </div>
@@ -416,9 +419,9 @@
                                 $("#li" + itemcat0.id).append('<div style="display: inline"></div>');
                                 //console.log("categorie : " + itemcat0.name + " type : " + itemcat0.type);
                                 if (itemcat0.type === 1) {
-                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-xs btn-default item" type="button" item_id="' + itemcat0.id + '" item_name="' + itemcat0.name + '" item_price="' + itemcat0.price + '" item_count="' + itemcat0.count + '">' + itemcat0.name + '</button>');
+                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default item" type="button" item_id="' + itemcat0.id + '" item_name="' + itemcat0.name + '" item_price="' + itemcat0.price + '" item_count="' + itemcat0.count + '">' + itemcat0.name + '</button>');
                                 } else {
-                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-xs btn-default" id="drop' + itemcat0.id + '" data-toggle="dropdown">' + itemcat0.name + ' <span class="caret"></span></button>');
+                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default" id="drop' + itemcat0.id + '" data-toggle="dropdown">' + itemcat0.name + ' <span class="caret"></span></button>');
                                     $("#li" + itemcat0.id + " div:first").append('<ul class="dropdown-menu" id="ul' + itemcat0.id + '" aria-labelledby="drop' + itemcat0.id + '"></ul>');
                                     $('#drop' + itemcat0.id).dropdown();
 
