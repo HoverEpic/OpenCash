@@ -31,7 +31,7 @@
                 </div>
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#">Caisse</a></li>
-                    <li><a href="#" data-toggle="modal" data-target="#myModal">Stocks</a></li>
+                    <li><a href="#" data-toggle="modal" data-target="#stockModal">Stocks</a></li>
                     <li><a href="#">Aide</a></li>
                     <li class="dropdown">
                         <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gestion <span class="caret"></span></a>
@@ -83,7 +83,7 @@
                                     </div>
                                     <br>
                                     <div class="row">
-                                        <div class="col-md-4 col-md-offset-4" id="numeric-pad">
+                                        <div class="col-md-6" id="numeric-pad">
                                             <button class="btn btn-default" type="submit" value="1">1</button>
                                             <button class="btn btn-default" type="submit" value="2">2</button>
                                             <button class="btn btn-default" type="submit" value="3">3</button><br>
@@ -104,47 +104,91 @@
                         </div>
                         <div class="col-md-4">
                             <div class="list-group" id="stock">
-                                <ul>
+                                <ul class="list-group" >
                                     <li class="list-group-item list-group-item-warning">Objets</li>
                                     <li class="list-group-item">
-                                        <div class="dropdown" style="display: inline">
-                                            <!-- Category -->
-                                            <button class="btn btn-xs btn-default dropdown-toggle item_category" type="button" data-toggle="dropdown">
-                                                Boucles d'oreilles <span class="caret"></span> <!-- -->
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <!-- Sub Category -->
-                                                <li class="dropdown-submenu">
-                                                    <a class="test" tabindex="-1" href="#">Simples <span class="caret"></span></a>
-                                                    <!-- Items -->
-                                                    <ul class="dropdown-menu">
-                                                        <li class="item" item_id="1" item_price="7" item_name="Boucles d'oreilles / Simples / Plumes"><a href="#">Plumes</a></li>
-                                                        <li class="item" item_id="2"  item_price="8" item_name="Boucles d'oreilles / Simples / Plumetis"><a href="#">Plumetis</a></li>
-                                                        <li class="item" item_id="3"  item_price="9" item_name="Boucles d'oreilles / Simples / Geometriques"><a href="#">Geometriques</a></li>
+                                        <ul id="itemCatArea" class="nav nav-pills">
+                                            <li class="dropdown">
+                                                <!-- Category -->
+                                                <div style="display: inline">
+                                                    <button class="btn btn-xs btn-default dropdown-toggle" aria-haspopup="true" type="button" data-toggle="dropdown">
+                                                        Boucles d'oreilles <span class="caret"></span> <!-- -->
+                                                    </button>
+                                                    <ul class="dropdown-menu level1">
+                                                        <!-- Sub Category -->
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" tabindex="-1" href="#">Simples <span class="caret"></span></a>
+                                                            <!-- Items -->
+                                                            <ul class="dropdown-menu level2">
+                                                                <li class="item" item_id="1" item_price="7" item_name="Boucles d'oreilles / Simples / Plumes"><a href="#">Plumes</a></li>
+                                                                <li class="item" item_id="2"  item_price="8" item_name="Boucles d'oreilles / Simples / Plumetis"><a href="#">Plumetis</a></li>
+                                                                <li class="item" item_id="3"  item_price="9" item_name="Boucles d'oreilles / Simples / Geometriques"><a href="#">Geometriques</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <!-- Sub Category -->
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" tabindex="-1" href="#">Doubles <span class="caret"></span></a>
+                                                            <!-- Items -->
+                                                            <ul class="dropdown-menu">
+                                                                <li><a href="#">Plumes</a></li>
+                                                                <li><a href="#">Plumetis</a></li>
+                                                                <li><a href="#">Geometriques</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <!-- Sub Category -->
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" tabindex="-1" href="#">Triples <span class="caret"></span></a>
+                                                            <!-- Items -->
+                                                            <ul class="dropdown-menu">
+                                                                <li><a href="#">Plumes</a></li>
+                                                                <li><a href="#">Plumetis</a></li>
+                                                                <li class="disabled"><a href="#">Geometriques</a></li>
+                                                            </ul>
+                                                        </li>
                                                     </ul>
-                                                </li>
-                                                <!-- Sub Category -->
-                                                <li class="dropdown-submenu">
-                                                    <a class="test" tabindex="-1" href="#">Doubles <span class="caret"></span></a>
-                                                    <!-- Items -->
-                                                    <ul class="dropdown-menu">
-                                                        <li><a href="#">Plumes</a></li>
-                                                        <li><a href="#">Plumetis</a></li>
-                                                        <li><a href="#">Geometriques</a></li>
+                                                </div>
+                                            </li>
+                                            <li class="dropdown">
+                                                <!-- Category -->
+                                                <div style="display: inline">
+                                                    <button class="btn btn-xs btn-default dropdown-toggle item_category" aria-haspopup="true" type="button" data-toggle="dropdown">
+                                                        Boucles d'oreilles <span class="caret"></span> <!-- -->
+                                                    </button>
+                                                    <ul class="dropdown-menu level1">
+                                                        <!-- Sub Category -->
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" tabindex="-1" href="#">Simples <span class="caret"></span></a>
+                                                            <!-- Items -->
+                                                            <ul class="dropdown-menu level2">
+                                                                <li class="item" item_id="1" item_price="7" item_name="Boucles d'oreilles / Simples / Plumes"><a href="#">Plumes</a></li>
+                                                                <li class="item" item_id="2"  item_price="8" item_name="Boucles d'oreilles / Simples / Plumetis"><a href="#">Plumetis</a></li>
+                                                                <li class="item" item_id="3"  item_price="9" item_name="Boucles d'oreilles / Simples / Geometriques"><a href="#">Geometriques</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <!-- Sub Category -->
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" tabindex="-1" href="#">Doubles <span class="caret"></span></a>
+                                                            <!-- Items -->
+                                                            <ul class="dropdown-menu">
+                                                                <li><a href="#">Plumes</a></li>
+                                                                <li><a href="#">Plumetis</a></li>
+                                                                <li><a href="#">Geometriques</a></li>
+                                                            </ul>
+                                                        </li>
+                                                        <!-- Sub Category -->
+                                                        <li class="dropdown-submenu">
+                                                            <a class="test" tabindex="-1" href="#">Triples <span class="caret"></span></a>
+                                                            <!-- Items -->
+                                                            <ul class="dropdown-menu">
+                                                                <li><a href="#">Plumes</a></li>
+                                                                <li><a href="#">Plumetis</a></li>
+                                                                <li class="disabled"><a href="#">Geometriques</a></li>
+                                                            </ul>
+                                                        </li>
                                                     </ul>
-                                                </li>
-                                                <!-- Sub Category -->
-                                                <li class="dropdown-submenu">
-                                                    <a class="test" tabindex="-1" href="#">Triples <span class="caret"></span></a>
-                                                    <!-- Items -->
-                                                    <ul class="dropdown-menu">
-                                                        <li><a href="#">Plumes</a></li>
-                                                        <li><a href="#">Plumetis</a></li>
-                                                        <li class="disabled"><a href="#">Geometriques</a></li>
-                                                    </ul>
-                                                </li>
-                                            </ul>
-                                        </div>
+                                                </div>
+                                            </li>
+                                        </ul>
                                     </li>
                                 </ul>
                             </div>
@@ -191,7 +235,7 @@
             <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
             <!-- Stock modal -->
-            <div class="modal fade" tabindex="-1" role="dialog" id="myModal">
+            <div class="modal fade" tabindex="-1" role="dialog" id="stockModal">
                 <div class="modal-dialog modal-lg" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
@@ -202,7 +246,7 @@
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs" role="tablist">
                                 <li role="presentation" class="active"><a href="#home" aria-controls="home" role="tab" data-toggle="tab">Par catégories <span id="add_itemcat" title="Ajouter" class="glyphicon glyphicon-plus"></span></a></li>
-                                <li role="presentation"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Tous les objets</a></li>
+                                <li role="presentation" class="disabled"><a href="#profile" aria-controls="profile" role="tab" data-toggle="tab">Tous les objets</a></li>
                             </ul>
                             <br>
 
@@ -211,22 +255,15 @@
                                 <div role="tabpanel" class="tab-pane active" id="home">
                                     <div class="row">
                                         <div class="col-md-4 ">
-                                            <ul class="list-group sortable">
-                                                <li class="list-group-item">Boucles d'oreilles <span title="Editer" class="glyphicon glyphicon-pencil edit_itemcat"></span> <span id="add_itemcat" title="Ajouter" class="glyphicon glyphicon-plus"></span> <span class="badge">3</span></li>
+                                            <ul class="list-group sortable" id="level0">
                                             </ul>
                                         </div>
                                         <div class="col-md-4">
-                                            <ul class="list-group sortable">
-                                                <li class="list-group-item">Simples <span data-toggle="modal" data-target="#itemsModal" title="Editer" class="glyphicon glyphicon-pencil"></span> <span id="add_itemcat" title="Ajouter" class="glyphicon glyphicon-plus"></span> <span class="badge">3</span></li>
-                                                <li class="list-group-item">Doubles</li>
-                                                <li class="list-group-item">Triples</li>
+                                            <ul class="list-group sortable" id="level1">
                                             </ul>
                                         </div>
                                         <div class="col-md-4">
-                                            <ul class="list-group sortable">
-                                                <li class="list-group-item" data-toggle="modal" data-target="#itemsModal">Plumes <span title="Editer" class="glyphicon glyphicon-pencil"></span> <span class="badge">5</span></li>
-                                                <li class="list-group-item">Plumetis <span class="badge">5</span></li>
-                                                <li class="list-group-item">Géometriques <span class="badge">5</span></li>
+                                            <ul class="list-group sortable" id="level2">
                                             </ul>
                                         </div>
                                     </div>
@@ -254,6 +291,9 @@
             <div class="modal fade" tabindex="-1" role="dialog" id="itemsModal">
                 <div class="modal-dialog" role="document">
                     <div class="modal-content">
+                        <input type="hidden" id="itemId" value="0"/>
+                        <input type="hidden" id="parentItemId" value="0"/>
+                        <input type="hidden" id="level" value="0"/>
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             <h4 class="modal-title">Edition</h4>
@@ -265,45 +305,29 @@
                             </div>
                             <div class="form-group">
                                 <label for="exampleInputFile">Personne</label>
-                                <select class="form-control">
-                                    <option>Clotilde</option>
-                                    <option>Alex</option>
-                                    <option>Élise</option>
-                                    <option>Charlène</option>
+                                <select class="form-control" id="people">
                                 </select>
                             </div>
                             <div class="form-group">
-                                <label for="exampleInputPassword1">Type</label>
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" name="optionsRadios" id="optionsRadios1" value="option1" checked>
-                                        Catégorie
-                                    </label>
-                                </div>
-                                <div class="radio">
-                                    <label>
-                                        <input type="radio" name="optionsRadios" id="optionsRadios2" value="option2">
-                                        Objet
-                                    </label>
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputFile">Couleur</label>
-                                <input type="text" class="form-control" id="1" placeholder="#FFFFFF">
+                                <label for="exampleInputFile">Type</label>
+                                <select class="form-control" id="type">
+                                    <option value="0">Catégorie</option>
+                                    <option value="1">Objet</option>
+                                </select>
                             </div>
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Prix (indicatif)</label>
-                                <input type="number" class="form-control" id="1" placeholder="Prix">
+                                <input type="number" class="form-control" id="price" placeholder="0" disabled>
                             </div>
                             <div class="form-group">
                                 <label for="exampleInputEmail1">Nombre</label>
-                                <input type="number" class="form-control" id="1" placeholder="1">
+                                <input type="number" class="form-control" id="count" placeholder="0" disabled>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-danger pull-left" data-dismiss="modal">Supprimer</button>
+                            <button type="button" class="btn btn-danger pull-left delete" data-dismiss="modal">Supprimer</button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button type="button" class="btn btn-primary save">Save changes</button>
                         </div>
                     </div>
                 </div>
@@ -320,17 +344,17 @@
                             <table class="table table-striped table-hover">
                                 <thead> <tr> <th>Personne</th> <th>Couleur</th> <th></th> </tr> </thead>
                                 <tbody>
-                                    <tr> <td>Clotilde</td> <td><span class="label label-primary">Bleu</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
-                                    <tr> <td>Alex</td> <td><span class="label label-default">Gris</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
-                                    <tr> <td>Charlène</td> <td><span class="label label-success">Vert</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
-                                    <tr> <td>Élise</td> <td><span class="label label-danger">Orange</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
+                                    <tr class="sortable"> <td>Chlotilde</td> <td><span class="label label-primary">Bleu</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
+                                    <tr class="sortable"> <td>Alex</td> <td><span class="label label-default">Gris</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
+                                    <tr class="sortable"> <td>Charlène</td> <td><span class="label label-success">Vert</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
+                                    <tr class="sortable"> <td>Élise</td> <td><span class="label label-danger">Orange</span></td> <td><span class="glyphicon glyphicon-trash pull-right" aria-hidden="true"></span></td> </tr>
                                     <tr> <td><input type="text" class="form-control"></td> <td><input type="text" class="form-control"></td> <td><span class="glyphicon glyphicon-plus pull-right" aria-hidden="true"></span></td> </tr>
                                 </tbody>
                             </table>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                            <button type="button" class="btn btn-primary">Save changes</button>
+                            <button type="button" class="btn btn-primary save">Save changes</button>
                         </div>
                     </div>
                 </div>
@@ -338,13 +362,120 @@
         </div>
         <!-- Javascript -->
         <script>
+            var lastStockDropdown = null;
             var lastInputField = $('#item-prepare #item_count'); //default to count
             var itemTicketCount = 0;
             var totalTicketPrice = 0;
             var ticketItem = 0;
 
+            var people = [];
+            var stockPopulated = false;
+
             $(document).ready(function () {
                 console.log("ready!");
+
+                // load people
+                $.ajax({
+                    url: '/getpeople',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        //console.log(data);
+                        if (data.error) {
+                            console.log(data.error);
+                        } else {
+                            people = data.result;
+                            // populate people
+                            for (let i = 0; i < people.length; i++) {
+                                $("#itemsModal #people").append('<option value = "' + people[i].id + '">' + people[i].name + '</option>');
+                            }
+                        }
+                    }
+                });
+
+                // load stock
+                $.ajax({
+                    url: '/getAllStock',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        //console.log(data);
+                        if (data.error) {
+                            console.log(data.error);
+                        } else {
+                            //return;
+                            // populate stock
+                            // clear actuals entries
+                            $("#itemCatArea").empty();
+                            //console.log(data.length);
+                            for(let i = 0; i < data.length; i++) { // level 0
+                                var itemcat0 = data[i];
+                                $("#itemCatArea").append('<li class="dropdown" id="li' + itemcat0.id + '"></li>');
+                                $("#li" + itemcat0.id).append('<div style="display: inline"></div>');
+                                //console.log("categorie : " + itemcat0.name + " type : " + itemcat0.type);
+                                if (itemcat0.type === 1) {
+                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-xs btn-default item" type="button" item_id="' + itemcat0.id + '" item_name="' + itemcat0.name + '" item_price="' + itemcat0.price + '" item_count="' + itemcat0.count + '">' + itemcat0.name + '</button>');
+                                } else {
+                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-xs btn-default" id="drop' + itemcat0.id + '" data-toggle="dropdown">' + itemcat0.name + ' <span class="caret"></span></button>');
+                                    $("#li" + itemcat0.id + " div:first").append('<ul class="dropdown-menu" id="ul' + itemcat0.id + '" aria-labelledby="drop' + itemcat0.id + '"></ul>');
+                                    $('#drop' + itemcat0.id).dropdown();
+
+                                    for(let j = 0; j < itemcat0.children.length; j++) { //level 1
+                                        var itemcat1 = itemcat0.children[j];
+                                        $("#ul" + itemcat0.id).append('<li class="dropdown-submenu"></li>');
+                                        //console.log("\tsous categorie : " + itemcat1.name);
+                                        if (itemcat1.type === 1) {
+                                            $("#li" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" class="item" item_id="' + itemcat1.id + '" item_name="' + itemcat1.name + '" item_price="' + itemcat1.price + '" item_count="' + itemcat1.count + '">' + itemcat1.name + '</a>');
+                                        } else {
+
+                                            $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" tabindex="-1" id="drop' + itemcat1.id + '" data-toggle="dropdown">' + itemcat1.name + ' <span class="caret"></span></a>');
+                                            $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<ul class="dropdown-menu" id="ul' + itemcat1.id + '" aria-labelledby="drop' + itemcat1.id + '"></ul>');
+                                            //$('#stock #drop' + itemcat1.id).dropdown();
+
+                                            for(let k = 0; k < itemcat1.children.length; k++) { //level 2
+                                                var itemcat2 = itemcat1.children[k];
+                                                //console.log("\t\tobjet : " + itemcat2.name);
+                                                $("#ul" + itemcat1.id).append('<li><a href="#" class="item" item_id="' + itemcat2.id + '" item_name="' + itemcat2.name + '" item_price="' + itemcat2.price + '" item_count="' + itemcat2.count + '">' + itemcat2.name + '</a></li>');
+                                            }
+                                        }
+                                    }
+                                    // category listener
+                                    $(".dropdown button").on('hide.bs.dropdown', function () {
+                                        if (lastStockDropdown !== null) {
+                                            lastStockDropdown.toggle(); // close last dropdown if not closed
+                                            lastStockDropdown = null;
+                                        }
+                                    });
+                                    $(".dropdown-submenu a").on("click", function(e){
+                                        if (lastStockDropdown !== null) {
+                                            lastStockDropdown.toggle(); // close last dropdown if not closed
+                                            lastStockDropdown = null;
+                                        }
+                                        lastStockDropdown = $(this).next('ul');
+                                        $(this).next('ul').toggle();
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                    });
+                                    //here add item listener
+                                    $('#stock .item').on("click", function (e) {
+                                        var itemPrice = $(this).attr('item_price');
+                                        var itemName = $(this).attr('item_name');
+                                        var itemCount = $(this).attr('item_count');
+                                        var itemId = $(this).attr('item_id');
+                                        $('#item-prepare #item_name').val(itemName);
+                                        $('#item-prepare #item_count').val(itemCount);
+                                        $('#item-prepare #item_price').val(itemPrice);
+                                        $('#item-prepare #item_id').val(itemId);
+                                        e.stopPropagation();
+                                        e.preventDefault();
+                                    });
+                                }
+                            }
+                        }
+                    }
+                });
 
                 // sorting ticket items or catégories/items
                 $(".sortable").sortable();
@@ -430,31 +561,6 @@
                 //    e.preventDefault();
                 //});
 
-                // item prepare
-                $('#stock .item').on("click", function (e) {
-                    var itemPrice = $(this).attr('item_price');
-                    var itemName = $(this).attr('item_name');
-                    var itemCount = $(this).attr('item_count');
-                    var itemId = $(this).attr('item_id');
-                    $('#item-prepare #item_name').val(itemName);
-                    $('#item-prepare #item_count').val(itemCount);
-                    $('#item-prepare #item_price').val(itemPrice);
-                    $('#item-prepare #item_id').val(itemId);
-                    e.stopPropagation();
-                    e.preventDefault();
-                });
-
-                // dropdown hack
-                var lastStockDropdown = null;
-                $('.dropdown-submenu a.test').on("click", function (e) {
-                    if (lastStockDropdown !== null)
-                        lastStockDropdown.toggle(); // close last dropdown if not closed
-                    lastStockDropdown = $(this).next('ul');
-                    $(this).next('ul').toggle();
-                    e.stopPropagation();
-                    e.preventDefault();
-                });
-
                 $('#pay').on("click", function (e) {
                     //checks
                     console.log("valide ticket :");
@@ -512,24 +618,186 @@
                     e.preventDefault();
                 });
 
-                $('.edit_itemcat').on("click", function (e) {
-                    var itemCatId = 000;
-                    var itemCatName = 000;
-                    var itemCatPeople = 000;
-                    var itemCatType = 000;
-                    var itemCatColor = 000;
-                    var itemCatPrice = 000;
-                    var itemCatCount = 000;
-                    $("#itemsModal .modal-title").html("Edition d'une catégorie ou d'un objet");
-                    $("#itemsModal #exampleInputName").val('');
-                    //populate people + select
-                    $("#itemsModal #exampleInputName").val('');
-                    $("#itemsModal").modal('show');
+                $('#itemsModal .save').on("click", function (e) {
+                    var level = $("#itemsModal #level").val();
+                    var id = $("#itemsModal #itemId").val(); //if 0 => insert, if not => update
+                    var parent = $("#itemsModal #parentItemId").val();
+                    var order = 0; //TODO implements order
+                    var name = $("#itemsModal #exampleInputName").val();
+                    var people = $("#itemsModal #people").val();
+                    var type = $("#itemsModal #type").val();
+                    var price = $("#itemsModal #price").val();
+                    var count = $("#itemsModal #count").val();
+
+                    if (price === "")
+                        price = 0;
+                    if (count === "")
+                        count = 0;
+
+                    // save
+                    $.ajax({
+                        url: '/addstock',
+                        type: 'PUT',
+                        data: JSON.stringify({id: id, parent: parent, order: order, name: name, people: people, type: type, price: price, count}),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                updateLevel(Number(level) + 1, parent, true);
+                            }
+                        }
+                    });
+
+                    // update
+                    $("#itemsModal").modal('hide');
                     e.stopPropagation();
                     e.preventDefault();
                 });
 
+                $('#itemsModal').on('hidden.bs.modal', function (e) {
+                    //reinit modal
+                    $("#itemsModal #itemId").val(0);
+                    $("#itemsModal #parentItemId").val(0);
+                    $("#itemsModal #level").val(0);
+                    $("#itemsModal #exampleInputName").val('');
+                    $("#itemsModal #people").val(0);
+                    $("#itemsModal #type").val(0);
+                    $("#itemsModal #type").removeAttr('disabled');
+                    $("#itemsModal #price").attr('disabled', true);
+                    $("#itemsModal #count").attr('disabled', true);
+                });
+
+                $('#itemsModal #type').change(function (e) {
+                    var select = $("#itemsModal #type option:selected").val();
+                    console.log(select);
+                    if (select === '1') {
+                        $("#itemsModal #price").removeAttr('disabled');
+                        $("#itemsModal #count").removeAttr('disabled');
+                    } else {
+                        $("#itemsModal #price").attr('disabled', true);
+                        $("#itemsModal #count").attr('disabled', true);
+                    }
+                });
+
+                $('#stockModal').on('show.bs.modal', function (e) {
+                    if (!stockPopulated) {
+                        //populate modal
+                        // level 0
+                        updateLevel(0, 0, false);
+                    }
+                });
+
+                $('#stockModal').on('hide.bs.modal', function (e) {
+                    // empty all levels
+                    $('#stockModal #level0').empty();
+                    $('#stockModal #level1').empty();
+                    $('#stockModal #level2').empty();
+                });
+
+
             });
+            function updateLevel(level, parent, clean) {
+                console.log("update level " + level);
+                if (clean)
+                    $('#stockModal #level' + level).empty();
+                $.ajax({
+                    url: '/getstock',
+                    type: 'POST',
+                    data: JSON.stringify({parent: parent}),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        //console.log(data);
+                        if (data.error) {
+                            console.log(data.error);
+                        } else {
+                            // render level0
+                            for (let i = 0; i < data.length; i++) {
+                                addItem(level, data[i]);
+                            }
+                            //stockPopulated = true;
+                        }
+                    }
+                });
+            }
+            var activeLevel = [];
+            function addItem(level, item) {
+
+                if (item.type === 0)
+                    $('#stockModal #level' + level).append('<li class="list-group-item ' + (activeLevel[level] === item.id ? ' active' : '') + '">' + item.name + ' <span title="Editer" class="glyphicon glyphicon-pencil edit_itemcat-' + item.id + '"></span> <span title="Ajouter" class="glyphicon glyphicon-plus add_itemcat-' + item.id + '"></span> <span title="Afficher les enfants" class="glyphicon glyphicon-chevron-right pull-right display_child-' + item.id + '" style="cursor: pointer;"></span></li>');
+                else
+                    $('#stockModal #level' + level).append('<li class="list-group-item ' + (activeLevel[level] === item.id ? ' active' : '') + '">' + item.name + ' <span title="Editer" class="glyphicon glyphicon-pencil edit_itemcat-' + item.id + '"></span> <span title="Stock" class="badge">' + item.count + '</span></li>');
+                //listener
+                $('.edit_itemcat-' + item.id).on('click', function (e) {
+                    $("#itemsModal .modal-title").html("Edition d'une catégorie ou d'un objet");
+                    $("#itemsModal #itemId").val(item.id);
+                    $("#itemsModal #exampleInputName").val(item.name);
+                    //populate people + select
+                    $("#itemsModal #people").val(item.people);
+                    $("#itemsModal #type").val(item.type);
+                    if (item.type === 1) {
+                        $("#itemsModal #price").removeAttr('disabled');
+                    }
+                    $("#itemsModal #price").val(item.price);
+                    $("#itemsModal #count").val(item.count);
+
+                    $("#itemsModal").modal('show');
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+                $('.add_itemcat-' + item.id).on('click', function (e) {
+                    $("#itemsModal .modal-title").html("Ajout d'un enfant de " + item.name);
+                    $("#itemsModal #parentItemId").val(item.id);
+                    $("#itemsModal #level").val(level);
+
+                    $("#itemsModal").modal('show');
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+                $('.display_child-' + item.id).on('click', function (e) {
+                    $.ajax({
+                        url: '/getstock',
+                        type: 'POST',
+                        data: JSON.stringify({parent: item.id}),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            //console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                // render level1
+                                $('#stockModal #level' + (level + 1)).empty();
+                                if (activeLevel[level] !== item.id) { // click on different cat
+                                    $('.display_child-' + activeLevel[level]).parent('li').removeClass('active');
+                                    activeLevel[level] = item.id;
+                                    $('.display_child-' + item.id).parent('li').addClass('active');
+                                    cleanLevels(['1', '2']);
+                                    for (let i = 0; i < data.length; i++) {
+                                        addItem(level + 1, data[i]);
+                                    }
+                                } else {
+                                    $('.display_child-' + activeLevel[level]).parent('li').removeClass('active');
+                                    activeLevel[level] = null;
+                                    cleanLevels([level, level +1]);
+                                }
+                                console.log("activeLevel " + level + " " + activeLevel[level]);
+                            }
+                        }
+                    });
+                    e.stopPropagation();
+                    e.preventDefault();
+                });
+            }
+            function cleanLevels(levels) {
+                for(let i; i > levels.length; i++) {
+                    $('#stockModal #level' + levels[i]).empty();
+                    console.log("clean " + levels[i]);
+                }
+            }
             function debug(something)
             {
                 console.log(JSON.stringify(something));
