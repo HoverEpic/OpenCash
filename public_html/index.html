@@ -29,20 +29,22 @@
                     </button>
                     <a class="navbar-brand" href="#">OpenCash</a>
                 </div>
-                <ul class="nav navbar-nav navbar-right">
-                    <li><a href="#">Caisse</a></li>
-                    <li><a href="#" data-toggle="modal" data-target="#stockModal">Stocks</a></li>
-                    <li><a href="#">Aide</a></li>
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gestion <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="#" data-toggle="modal" data-target="#personnesModal">Personnes</a></li>
-                            <li><a href="#">Stock</a></li>
-                            <li><a href="#">Aide</a></li>
-                            <li><a href="3">Déconnexion</a></li>
-                        </ul>
-                    </li>
-                </ul>
+                <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li><a href="#">Caisse</a></li>
+                        <li><a href="#" data-toggle="modal" data-target="#stockModal">Stocks</a></li>
+                        <li><a href="#">Aide</a></li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Gestion <span class="caret"></span></a>
+                            <ul class="dropdown-menu">
+                                <li><a href="#" data-toggle="modal" data-target="#personnesModal">Personnes</a></li>
+                                <li><a href="#">Stock</a></li>
+                                <li><a href="#">Aide</a></li>
+                                <li><a href="3">Déconnexion</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
         <div class="container-fluid">
@@ -149,6 +151,14 @@
                                             <button class="btn btn-default" type="button">Go!</button>
                                         </span>
                                     </div><!-- /input-group -->
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="panel panel-default">
+                                <div class="panel-heading">Historique des tickets</div>
+                                <div class="panel-body">
+                                    <button class="btn btn-default pull-right" type="button">Clique ici !</button>
                                 </div>
                             </div>
                         </div>
