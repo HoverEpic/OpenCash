@@ -51,14 +51,14 @@
                     <div class="row">
                         <div class="col-md-4" id="ticket">
                             <ul class="list-group sortable">
-                                <li class="list-group-item active">
+                                <li class="list-group-item list-group-item-success">
                                     Ticket <span class="badge">0</span>
                                 </li>
                                 <!--<li class="list-group-item ticket_item">Dapibus (2€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
                                 <li class="list-group-item">Morbi (3€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
                                 <li class="list-group-item">Porta (17€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
                                 <li class="list-group-item">Vestibulum (26€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>-->
-                                <li class="list-group-item list-group-item-success" id="total">Total : 0 €</li>
+                                <li class="list-group-item" id="total">Total : 0 €</li>
                             </ul>
                         </div>
                         <div class="col-md-4">
@@ -111,86 +111,7 @@
                                     <li class="list-group-item list-group-item-warning">Objets</li>
                                     <li class="list-group-item">
                                         <ul id="itemCatArea" class="nav nav-pills">
-                                            <li class="dropdown">
-                                                <!-- Category -->
-                                                <div style="display: inline">
-                                                    <button class="btn btn-xs btn-default dropdown-toggle" aria-haspopup="true" type="button" data-toggle="dropdown">
-                                                        Boucles d'oreilles <span class="caret"></span> <!-- -->
-                                                    </button>
-                                                    <ul class="dropdown-menu level1">
-                                                        <!-- Sub Category -->
-                                                        <li class="dropdown-submenu">
-                                                            <a class="test" tabindex="-1" href="#">Simples <span class="caret"></span></a>
-                                                            <!-- Items -->
-                                                            <ul class="dropdown-menu level2">
-                                                                <li class="item" item_id="1" item_price="7" item_name="Boucles d'oreilles / Simples / Plumes"><a href="#">Plumes</a></li>
-                                                                <li class="item" item_id="2"  item_price="8" item_name="Boucles d'oreilles / Simples / Plumetis"><a href="#">Plumetis</a></li>
-                                                                <li class="item" item_id="3"  item_price="9" item_name="Boucles d'oreilles / Simples / Geometriques"><a href="#">Geometriques</a></li>
-                                                            </ul>
-                                                        </li>
-                                                        <!-- Sub Category -->
-                                                        <li class="dropdown-submenu">
-                                                            <a class="test" tabindex="-1" href="#">Doubles <span class="caret"></span></a>
-                                                            <!-- Items -->
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#">Plumes</a></li>
-                                                                <li><a href="#">Plumetis</a></li>
-                                                                <li><a href="#">Geometriques</a></li>
-                                                            </ul>
-                                                        </li>
-                                                        <!-- Sub Category -->
-                                                        <li class="dropdown-submenu">
-                                                            <a class="test" tabindex="-1" href="#">Triples <span class="caret"></span></a>
-                                                            <!-- Items -->
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#">Plumes</a></li>
-                                                                <li><a href="#">Plumetis</a></li>
-                                                                <li class="disabled"><a href="#">Geometriques</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </li>
-                                            <li class="dropdown">
-                                                <!-- Category -->
-                                                <div style="display: inline">
-                                                    <button class="btn btn-xs btn-default dropdown-toggle item_category" aria-haspopup="true" type="button" data-toggle="dropdown">
-                                                        Boucles d'oreilles <span class="caret"></span> <!-- -->
-                                                    </button>
-                                                    <ul class="dropdown-menu level1">
-                                                        <!-- Sub Category -->
-                                                        <li class="dropdown-submenu">
-                                                            <a class="test" tabindex="-1" href="#">Simples <span class="caret"></span></a>
-                                                            <!-- Items -->
-                                                            <ul class="dropdown-menu level2">
-                                                                <li class="item" item_id="1" item_price="7" item_name="Boucles d'oreilles / Simples / Plumes"><a href="#">Plumes</a></li>
-                                                                <li class="item" item_id="2"  item_price="8" item_name="Boucles d'oreilles / Simples / Plumetis"><a href="#">Plumetis</a></li>
-                                                                <li class="item" item_id="3"  item_price="9" item_name="Boucles d'oreilles / Simples / Geometriques"><a href="#">Geometriques</a></li>
-                                                            </ul>
-                                                        </li>
-                                                        <!-- Sub Category -->
-                                                        <li class="dropdown-submenu">
-                                                            <a class="test" tabindex="-1" href="#">Doubles <span class="caret"></span></a>
-                                                            <!-- Items -->
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#">Plumes</a></li>
-                                                                <li><a href="#">Plumetis</a></li>
-                                                                <li><a href="#">Geometriques</a></li>
-                                                            </ul>
-                                                        </li>
-                                                        <!-- Sub Category -->
-                                                        <li class="dropdown-submenu">
-                                                            <a class="test" tabindex="-1" href="#">Triples <span class="caret"></span></a>
-                                                            <!-- Items -->
-                                                            <ul class="dropdown-menu">
-                                                                <li><a href="#">Plumes</a></li>
-                                                                <li><a href="#">Plumetis</a></li>
-                                                                <li class="disabled"><a href="#">Geometriques</a></li>
-                                                            </ul>
-                                                        </li>
-                                                    </ul>
-                                                </div>
-                                            </li>
+                                            <li>Pas de stock trouvé, vérifier la liaison avec le serveur !</li>
                                         </ul>
                                     </li>
                                 </ul>
@@ -204,13 +125,13 @@
                                 <div class="panel-body" id="payement_methods">
                                     <div class="btn-group" data-toggle="buttons">
                                         <label class="btn btn-primary">
-                                            <input type="radio" name="options" id="cash" autocomplete="off" checked> Espèces
+                                            <input type="radio" name="options" id="cash" autocomplete="off"> Espèces <span class="glyphicon glyphicon-ok"></span>
                                         </label>
                                         <label class="btn btn-info">
-                                            <input type="radio" name="options" id="check" autocomplete="off"> Chèque
+                                            <input type="radio" name="options" id="check" autocomplete="off"> Chèque <span class="glyphicon glyphicon-ok"></span>
                                         </label>
                                         <label class="btn btn-success">
-                                            <input type="radio" name="options" id="card" autocomplete="off"> Carte bleue
+                                            <input type="radio" name="options" id="card" autocomplete="off"> Carte bleue <span class="glyphicon glyphicon-ok"></span>
                                         </label>
                                     </div>
                                     <button type="button" class="btn btn-success pull-right" id="pay">Encaisser</button>
@@ -413,7 +334,7 @@
                             // clear actuals entries
                             $("#itemCatArea").empty();
                             //console.log(data.length);
-                            for(let i = 0; i < data.length; i++) { // level 0
+                            for (let i = 0; i < data.length; i++) { // level 0
                                 var itemcat0 = data[i];
                                 $("#itemCatArea").append('<li class="dropdown" id="li' + itemcat0.id + '"></li>');
                                 $("#li" + itemcat0.id).append('<div style="display: inline"></div>');
@@ -421,26 +342,31 @@
                                 if (itemcat0.type === 1) {
                                     $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default item" type="button" item_id="' + itemcat0.id + '" item_name="' + itemcat0.name + '" item_price="' + itemcat0.price + '" item_count="' + itemcat0.count + '">' + itemcat0.name + '</button>');
                                 } else {
-                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default" id="drop' + itemcat0.id + '" data-toggle="dropdown">' + itemcat0.name + ' <span class="caret"></span></button>');
-                                    $("#li" + itemcat0.id + " div:first").append('<ul class="dropdown-menu" id="ul' + itemcat0.id + '" aria-labelledby="drop' + itemcat0.id + '"></ul>');
-                                    $('#drop' + itemcat0.id).dropdown();
+                                        $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default" id="drop' + itemcat0.id + '" data-toggle="dropdown">' + itemcat0.name + ' <span class="caret"></span></button>');
+                                        $("#li" + itemcat0.id + " div:first").append('<ul class="dropdown-menu" id="ul' + itemcat0.id + '" aria-labelledby="drop' + itemcat0.id + '"></ul>');
+                                        $('#drop' + itemcat0.id).dropdown();
+                                    if (itemcat0.children.length === 0) {
+                                        $("#ul" + itemcat0.id).append('<li class="dropdown-submenu disabled"><a href="#"style="color: red;">Vide</a></li>');
+                                    } else {
+                                        for (let j = 0; j < itemcat0.children.length; j++) { //level 1
+                                            var itemcat1 = itemcat0.children[j];
+                                            $("#ul" + itemcat0.id).append('<li class="dropdown-submenu"></li>');
+                                            //console.log("\tsous categorie : " + itemcat1.name);
+                                            if (itemcat1.type === 1) {
+                                                $("#li" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" class="item" item_id="' + itemcat1.id + '" item_name="' + itemcat1.name + '" item_price="' + itemcat1.price + '" item_count="' + itemcat1.count + '">' + itemcat1.name + '</a>');
+                                            } else {
+                                                $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" tabindex="-1" id="drop' + itemcat1.id + '" data-toggle="dropdown">' + itemcat1.name + ' <span class="caret"></span></a>');
+                                                $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<ul class="dropdown-menu" id="ul' + itemcat1.id + '" aria-labelledby="drop' + itemcat1.id + '"></ul>');
 
-                                    for(let j = 0; j < itemcat0.children.length; j++) { //level 1
-                                        var itemcat1 = itemcat0.children[j];
-                                        $("#ul" + itemcat0.id).append('<li class="dropdown-submenu"></li>');
-                                        //console.log("\tsous categorie : " + itemcat1.name);
-                                        if (itemcat1.type === 1) {
-                                            $("#li" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" class="item" item_id="' + itemcat1.id + '" item_name="' + itemcat1.name + '" item_price="' + itemcat1.price + '" item_count="' + itemcat1.count + '">' + itemcat1.name + '</a>');
-                                        } else {
-
-                                            $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" tabindex="-1" id="drop' + itemcat1.id + '" data-toggle="dropdown">' + itemcat1.name + ' <span class="caret"></span></a>');
-                                            $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<ul class="dropdown-menu" id="ul' + itemcat1.id + '" aria-labelledby="drop' + itemcat1.id + '"></ul>');
-                                            //$('#stock #drop' + itemcat1.id).dropdown();
-
-                                            for(let k = 0; k < itemcat1.children.length; k++) { //level 2
-                                                var itemcat2 = itemcat1.children[k];
-                                                //console.log("\t\tobjet : " + itemcat2.name);
-                                                $("#ul" + itemcat1.id).append('<li><a href="#" class="item" item_id="' + itemcat2.id + '" item_name="' + itemcat2.name + '" item_price="' + itemcat2.price + '" item_count="' + itemcat2.count + '">' + itemcat2.name + '</a></li>');
+                                                if (itemcat1.children.length === 0) {
+                                                    $("#ul" + itemcat1.id).append('<li class="disabled"><a href="#"style="color: red;">Vide</a></li>');
+                                                } else {
+                                                    for (let k = 0; k < itemcat1.children.length; k++) { //level 2
+                                                        var itemcat2 = itemcat1.children[k];
+                                                        //console.log("\t\tobjet : " + itemcat2.name);
+                                                        $("#ul" + itemcat1.id).append('<li><a href="#" class="item" item_id="' + itemcat2.id + '" item_name="' + itemcat2.name + '" item_price="' + itemcat2.price + '" item_count="' + itemcat2.count + '">' + itemcat2.name + '</a></li>');
+                                                    }
+                                                }
                                             }
                                         }
                                     }
@@ -451,7 +377,7 @@
                                             lastStockDropdown = null;
                                         }
                                     });
-                                    $(".dropdown-submenu a").on("click", function(e){
+                                    $(".dropdown-submenu a").on("click", function (e) {
                                         if (lastStockDropdown !== null) {
                                             lastStockDropdown.toggle(); // close last dropdown if not closed
                                             lastStockDropdown = null;
@@ -555,14 +481,20 @@
                     e.stopPropagation();
                     e.preventDefault();
                 });
-                // remove from ticket (TODO REMOVE)
-                //$('#ticket .glyphicon').on("click", function (e) {
-                //    itemTicketCount--;//update count and total
-                //    $('#ticket .badge').html(itemTicketCount);
-                //    $(this).parent('li').remove();
-                //    e.stopPropagation();
-                //    e.preventDefault();
-                //});
+
+                $('#reset').on("click", function (e) {
+                    $('#item-prepare #item_name').val('');
+                    $('#item-prepare #item_id').val('');
+                    $('#item-prepare #item_count').val('');
+                    $('#item-prepare #item_price').val('');
+                });
+                
+                $('#payement_methods .glyphicon').hide();
+                $('#payement_methods label').on("click", function (e) {
+                    $('#payement_methods .glyphicon').hide();
+                    $(this).children('span').show();
+                    console.log('test');
+                });
 
                 $('#pay').on("click", function (e) {
                     //checks
@@ -575,6 +507,20 @@
                         var tprice = $(this).attr('total_price');
                         console.log("- " + name + "(id:" + id + "), " + count + " x " + price + " € (" + tprice + ")");
                     });
+                    var payment_mode = $('#payement_methods .active input').attr('id');
+                    switch (payment_mode) {
+                        case 'cash':
+                            break;
+                        case 'check':
+                            break;
+                        case 'card':
+                            break;
+                        default:
+                            alert("Pas de moyen de paiement défini !");
+                            return;
+                            break;
+                    }
+                    console.log("Mode : " + payment_mode);
                     console.log("Articles : " + itemTicketCount);
                     console.log("Total : " + totalTicketPrice + " €");
 
@@ -785,7 +731,7 @@
                                 } else {
                                     $('.display_child-' + activeLevel[level]).parent('li').removeClass('active');
                                     activeLevel[level] = null;
-                                    cleanLevels([level, level +1]);
+                                    cleanLevels([level, level + 1]);
                                 }
                                 console.log("activeLevel " + level + " " + activeLevel[level]);
                             }
@@ -796,7 +742,7 @@
                 });
             }
             function cleanLevels(levels) {
-                for(let i; i > levels.length; i++) {
+                for (let i; i > levels.length; i++) {
                     $('#stockModal #level' + levels[i]).empty();
                     console.log("clean " + levels[i]);
                 }
