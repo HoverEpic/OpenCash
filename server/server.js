@@ -193,6 +193,75 @@ app.post('/deleteStock', function (req, res) {
             res.status(403).send();
     });
 });
+app.put('/ticket', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var mode = req.body.mode;
+            var items = req.body.items;
+            var mail = req.body.mail;
+            var total = 0;
+            for (let i = 0; i < items.length; i++) {
+                let item = items[i];
+                total = total + item.price;
+            }
+            add_ticket(mode, items, total, mail, function (result) {
+                if (result)
+                    res.send(JSON.stringify({result: result}));
+                else
+                    res.send(JSON.stringify({}));
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.get('/tickets', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var limit = req.query.limit || 10;
+            var offset = req.query.offset || 0;
+            var order = req.query.order || 'asc';
+            var sort = req.query.sort || 'id';
+            var search = req.query.search || '';
+            get_all_tickets(limit, offset, order.toUpperCase(), sort, search, function (results) {
+                var rows = [];
+                var total = 100;
+                if (results) {
+                    rows = results[0];
+                    total = results[1][0].total;
+                }
+                res.send(JSON.stringify({rows: rows, total: total}));
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.get('/ticket', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var ticketId = req.query.id;
+            get_ticket(ticketId, function (results) {
+                if (results)
+                    res.send(JSON.stringify(results));
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.delete('/delltickets', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var ids = req.body.ids || [];
+            if (ids.length === 0)
+                res.status(200).send();
+            else
+                remove_tickets("(" + ids.join(", ") + ")", function (result) {
+                    if (result)
+                        res.status(200).send();
+                });
+        } else
+            res.status(403).send();
+    });
+});
 
 // Security
 var check_auth = function (req, res, result) {
@@ -229,7 +298,7 @@ var getOrderedItems = function (result) {
 
                 var itemcat0 = temp[i];
                 itemcat0.children = [];
-                
+
                 if (itemcat0.parent === 0) {
 //                    console.log(itemcat0.id + " " + itemcat0.name +" is parent");
                     for (let j = 0; j < temp.length; j++) { // level 1
@@ -357,5 +426,67 @@ var remove_itemcat = function (id, result) {
     });
 };
 //ticket
+var add_ticket = function (payementMode, items, total, mail, result) {
+    pool.query('INSERT INTO Ticket SET date = now(), ?', {type: payementMode, total: total, mail: mail}, function (error, results) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        let ticketId = results.insertId;
+        for (let i = 0; i < items.length; i++) {
+            let item = items[i];
+            pool.query('INSERT INTO Ticketlines SET ?', {ticket: ticketId, item: item.id, name: item.name, count: item.count, price: item.price}, function (error, results) {
+                if (error) {
+                    console.log(error);
+                    return result(false);
+                }
+            });
+        }
+        return result(ticketId);
+    });
+};
+var get_ticket = function (ticketId, result) {
+    pool.query(
+            'SELECT * FROM Ticket WHERE id = ?', [ticketId], function (error, results) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        var data = {id: results[0].id, date: results[0].date, mode: results[0].type, total: results[0].total, mail: results[0].mail};
+        pool.query('SELECT * FROM Ticketlines WHERE ticket = ? ORDER BY `id`', [ticketId], function (error, results) {
+            if (error) {
+                console.log(error);
+                return result(false);
+            }
+            data.items = results;
+            return result(data);
+        });
+        return result(false);
+    });
+};
+var get_all_tickets = function (limit, offset, sort, order, search, result) {
+    pool.query([
+        [
+            'SELECT * FROM Ticket WHERE deleted = 0',
+            'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
+        ].join(' '),
+        'SELECT COUNT(*) as total FROM Ticket'].join(';'), function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};
+var remove_tickets = function (ids, result) {
+    pool.query('UPDATE Ticket SET deleted = 1 WHERE id IN ' + ids, function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(true);
+    });
+};
+
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);

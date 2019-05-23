@@ -55,7 +55,7 @@
                         <div class="col-md-4" id="ticket">
                             <ul class="list-group sortable">
                                 <li class="list-group-item list-group-item-success unsortable">
-                                    Ticket <span class="badge">0</span>
+                                    Ticket<span id="ticketId"></span> <span class="badge">0</span>
                                 </li>
                                 <!--<li class="list-group-item ticket_item">Dapibus (2€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
                                 <li class="list-group-item">Morbi (3€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>
@@ -143,7 +143,7 @@
                             </div>
                         </div>
                         <div class="col-md-4">
-                            <div class="panel panel-default">
+                            <div class="panel panel-default" id="mailTicket">
                                 <div class="panel-heading">Envoi du ticket par mail</div>
                                 <div class="panel-body">
                                     <div class="input-group">
@@ -159,7 +159,7 @@
                             <div class="panel panel-default">
                                 <div class="panel-heading">Historique des tickets</div>
                                 <div class="panel-body">
-                                    <button class="btn btn-default pull-right" type="button">Clique ici !</button>
+                                    <button class="btn btn-default pull-right" type="button" data-toggle="modal" data-target="#ticketsModal">Clique ici !</button>
                                 </div>
                             </div>
                         </div>
@@ -171,6 +171,7 @@
             <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.js"></script>
             <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/locale/bootstrap-table-fr-FR.min.js"></script>
+            <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.9.0/moment-with-locales.js"></script>
             <!-- Stock modal -->
             <div class="modal fade" tabindex="-1" role="dialog" id="stockModal">
                 <div class="modal-dialog modal-lg" role="document">
@@ -292,6 +293,56 @@
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary save">Save changes</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Tickets history -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="ticketsModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Tickets</h4>
+                        </div>
+                        <div class="modal-body">
+                            <table></table>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Ticket history -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="ticketModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Ticket #<span></span></h4>
+                        </div>
+                        <div class="modal-body">
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon1">Date</span>
+                                <input type="text" class="form-control date" aria-describedby="basic-addon1" readonly>
+                            </div>
+                            <br>
+                            <ul class="list-group">
+                                <li class="list-group-item list-group-item-success">Objets</li>
+                            </ul>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon2">Mode de paiement</span>
+                                <input type="text" class="form-control mode" aria-describedby="basic-addon2" readonly>
+                            </div>
+                            <br>
+                            <div class="input-group">
+                                <span class="input-group-addon" id="basic-addon3">Mail</span>
+                                <input type="text" class="form-control mail" aria-describedby="basic-addon3" readonly>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                         </div>
                     </div>
                 </div>
@@ -493,7 +544,7 @@
                     //update count and total
                     $('#ticket .badge').html(itemTicketCount);
                     //update total
-                    $('#ticket ul').append('<li class="list-group-item list-group-item-success" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                    $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
                     e.stopPropagation();
                     e.preventDefault();
                 });
@@ -514,53 +565,88 @@
 
                 $('#pay').on("click", function (e) {
                     //checks
-                    console.log("valide ticket :");
-                    $('.ticket_item').each(function (i, obj) {
-                        var id = $(this).attr('item_id');
-                        var name = $(this).attr('item_name');
-                        var count = $(this).attr('item_count');
-                        var price = $(this).attr('item_price');
-                        var tprice = $(this).attr('total_price');
-                        console.log("- " + name + "(id:" + id + "), " + count + " x " + price + " € (" + tprice + ")");
-                    });
                     var payment_mode = $('#payement_methods .active input').attr('id');
                     switch (payment_mode) {
                         case 'cash':
+                            payment_mode = 0;
                             break;
                         case 'check':
+                            payment_mode = 1;
                             break;
                         case 'card':
+                            payment_mode = 2;
                             break;
                         default:
                             alert("Pas de moyen de paiement défini !");
                             return;
                             break;
                     }
+                    console.log("valide ticket :");
+                    var items = [];
+                    $('.ticket_item').each(function (i, obj) {
+                        var id = $(this).attr('item_id');
+                        var name = $(this).attr('item_name');
+                        var count = $(this).attr('item_count');
+                        var price = $(this).attr('item_price');
+                        var tprice = $(this).attr('total_price');
+                        items[i] = {id: id, name: name, count: count, price: price};
+                        console.log("- " + name + "(id:" + id + "), " + count + " x " + price + " € (" + tprice + ")");
+                    });
+                    var mail = $('#mailTicket input').val();
+                    console.log("Items : " + items);
                     console.log("Mode : " + payment_mode);
+                    console.log("Mail : " + mail);
                     console.log("Articles : " + itemTicketCount);
                     console.log("Total : " + totalTicketPrice + " €");
 
-                    // post data
+                    if (items.length === 0) {
+                        return;
+                    }
 
-                    //disable modification
-                    $(".sortable").sortable("disable");
-                    $('#ticket .glyphicon').hide();
-                    $('#item-prepare #add_to_ticket').attr('disabled', true);
-                    $('#stock .item_category').attr('disabled', true);
-                    $('#payement_methods #pay').hide();
-                    $('#payement_methods #new_ticket').show();
-                    e.stopPropagation();
-                    e.preventDefault();
+                    // post data
+                    var data = {mode: payment_mode, items: items, mail: mail};
+                    $.ajax({
+                        url: '/ticket',
+                        type: 'PUT',
+                        data: JSON.stringify(data),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                                alert("Ticket non transmis, verifiez la connection internet !");
+                            } else {
+                                var ticketId = data.result;
+                                console.log("Ticket Id : " + ticketId);
+                                $('#ticketId').html(" #" + ticketId);
+                                //disable modification
+                                $(".sortable").sortable("disable");
+                                $('#ticket .glyphicon').hide();
+                                $('#item-prepare #add_to_ticket').attr('disabled', true);
+                                $('#stock .item_category').attr('disabled', true);
+                                $('#payement_methods #pay').hide();
+                                $('#payement_methods label').attr('disabled', true);
+                                $('#payement_methods #new_ticket').show();
+                                e.stopPropagation();
+                                e.preventDefault();
+                            }
+                        },
+                        error: function (data) {
+                            alert("Ticket non transmis, verifiez la connection internet !");
+                        }
+                    });
                 });
 
                 $('#new_ticket').on("click", function (e) {
                     //empty ticket
+                    $('#ticketId').html("");
                     itemTicketCount = 0;
                     $('#ticket .badge').html(itemTicketCount);
                     totalTicketPrice = 0;
                     $('#ticket .ticket_item').remove();
                     $('#ticket #total').remove();
-                    $('#ticket ul').append('<li class="list-group-item list-group-item-success" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                    $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
 
                     //enable modification
                     $(".sortable").sortable("enable");
@@ -568,6 +654,7 @@
                     $('#item-prepare #add_to_ticket').attr('disabled', false);
                     $('#stock .item_category').attr('disabled', false);
                     $('#payement_methods #new_ticket').hide();
+                    $('#payement_methods label').attr('disabled', false);
                     $('#payement_methods #pay').show();
                     e.stopPropagation();
                     e.preventDefault();
@@ -662,8 +749,60 @@
                     $('#stockModal #level2').empty();
                 });
 
+                $('#ticketsModal table').bootstrapTable({//http://bootstrap-table.wenzhixin.net.cn/documentation/
+                    classes: 'table table-hover table-condensed table-responsive',
+                    toolbar: "#toolbar",
+                    url: '/tickets',
+                    method: 'get',
+                    sidePagination: 'server',
+                    cache: false,
+                    height: '',
+                    striped: false,
+                    pagination: true,
+                    pageSize: 10,
+                    pageList: [10, 25, 50, 100, 200],
+                    search: false,
+                    searchAlign: 'right',
+                    showColumns: false,
+                    showRefresh: false,
+                    showHeader: true,
+                    minimumCountColumns: 2,
+                    clickToSelect: false,
+                    columns: [
+                        {
+                            field: 'id',
+                            title: 'Id'
+                        }, {
+                            field: 'date',
+                            title: 'Date',
+                            formatter: dateFormat
+                        }, {
+                            field: 'total',
+                            title: 'Total'
+                        }, {
+                            field: 'type',
+                            title: 'Paiement',
+                            formatter: payementModeFormat
+                        }, {
+                            title: 'Actions',
+                            events: operateEvents,
+                            formatter: ticketOptions
+                        }
+                    ]
+                });
 
+                $('#ticketsModal').on('show.bs.modal', function (e) {
+                    $('#ticketsModal table').bootstrapTable('refresh');
+                });
             });
+            window.operateEvents = {// catch table events here !
+                'click .view': function (e, value, row, index) {
+                    viewTicket(row);
+                },
+                'click .remove': function (e, value, row, index) {
+                    removeTicket(row.id);
+                }
+            };
             function updateLevel(level, parent, clean) {
                 console.log("update level " + level);
                 if (clean)
@@ -762,6 +901,91 @@
                     $('#stockModal #level' + levels[i]).empty();
                     console.log("clean " + levels[i]);
                 }
+            }
+            function dateFormat(value, row, index) {
+                var time = moment(value);
+                if (time.isValid())
+                    return time.format('DD/MM/YYYY HH:mm');
+                return "";
+            }
+            function payementModeFormat(value, row, index) {
+                switch (value) {
+                    case 0:
+                        return "Espèce";
+                        break;
+                    case 1:
+                        return "Chèque";
+                        break;
+                    case 2:
+                        return "Carte bleue";
+                        break;
+                    default:
+                        return "";
+                }
+            }
+            function ticketOptions(value, row, index) {
+                return [
+                    '<button class="btn btn-default btn-xs view" title="Voir">',
+                    '<i class="glyphicon glyphicon-list"></i> Voir',
+                    '</button> ',
+                    '<button class="btn btn-danger btn-xs remove" title="Delete">',
+                    '<i class="glyphicon glyphicon-remove"></i> Remove',
+                    '</button> '
+                ].join('');
+            }
+            function viewTicket(row) {
+                $.ajax({
+                    url: '/ticket',
+                    type: 'GET',
+                    data: row,
+                    contentType: 'application/json',
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        //console.log(data);
+                        if (data.error) {
+                            console.log(data.error);
+                        } else {
+                            console.log(data);
+                            $('#ticketModal .modal-title span').html(data.id);
+                            var time = moment(data.date);
+                            if (time.isValid())
+                                time = time.format('DD/MM/YYYY HH:mm');
+                            $('#ticketModal .date').val(time);
+                            $('#ticketModal .mode').val(payementModeFormat(data.mode));
+                            $('#ticketModal .mail').val(data.mail);
+                            // items
+                            $('#ticketModal .ticket_item').remove();
+                            $('#ticketModal .total').remove();
+                            for (let i = 0; i < data.items.length; i++) {
+                                var countDisplay = data.items[i].count > 1 ? ' x' + data.items[i].count : "";
+                                $('#ticketModal ul').append('<li class="list-group-item ticket_item">' + data.items[i].name + " " + countDisplay + ' (' + data.items[i].price + '€)</li>');
+                            }
+                            $('#ticketModal ul').append('<li class="list-group-item total">Total : ' + data.total + ' €</li>');
+                            $('#ticketModal').modal('show');
+                        }
+                    }
+                });
+            }
+            function removeTicket(ids) {
+                if (!Array.isArray(ids))
+                    ids = [ids];
+                $.ajax({
+                    url: '/delltickets',
+                    type: 'DELETE',
+                    data: JSON.stringify({ids: ids}),
+                    contentType: 'application/json',
+                    success: function (data) {
+                        if (data.error) {
+                            console.log(data.error);
+                        } else {
+                            $('#ticketsModal table').bootstrapTable('remove', {
+                                field: 'id',
+                                values: ids
+                            });
+                            $('#ticketsModal table').bootstrapTable('refresh');
+                        }
+                    }
+                });
             }
             function debug(something)
             {
