@@ -168,7 +168,7 @@ app.put('/addstock', function (req, res) {
 
             console.log(req.body);
 
-            if (id !== '0') {
+            if (id !== 0) {
                 update_itemcat(id, parent, order, name, type, people, price, count, function (result) {
                     if (result)
                         res.send(JSON.stringify({result: result}));
@@ -216,9 +216,13 @@ app.put('/ticket', function (req, res) {
                 total = total + item.price;
             }
             add_ticket(mode, items, total, mail, function (result) {
-                if (result)
-                    res.send(JSON.stringify({result: result}));
-                else
+                if (result) {
+                    if (mail !== null || mail !== "") {
+                        send_ticket(result, mail, function (mail_result) {
+                            res.send(JSON.stringify({result: result, mail: mail_result}));
+                        });
+                    }
+                } else
                     res.send(JSON.stringify({}));
             });
         } else
@@ -269,6 +273,24 @@ app.delete('/delltickets', function (req, res) {
                     if (result)
                         res.status(200).send();
                 });
+        } else
+            res.status(403).send();
+    });
+});
+app.post('/sendticket', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var id = req.body.id;
+            var mail = req.body.mail;
+            if (mail !== null || mail !== "") {
+                update_ticket_mail(mail, id, function(result_update) {
+                    if (result_update)
+                        send_ticket(id, mail, function (mail_result) {
+                            res.send(JSON.stringify({mail: mail_result}));
+                        });
+                });
+                
+            }
         } else
             res.status(403).send();
     });
@@ -365,7 +387,7 @@ var add_people = function (name, color, color2, result) {
     });
 };
 var update_people = function (id, name, color, color2, result) {
-    pool.query('UPDATE People SET name = ?, color = ?, color2 = ? WHERE id = ?', [name, color, color2, id], function (error, results, fields) {
+    pool.query('UPDATE People SET `name` = ?, `color` = ?, `color2` = ? WHERE id = ?', [name, color, color2, id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -374,7 +396,7 @@ var update_people = function (id, name, color, color2, result) {
     });
 };
 var remove_people = function (id, result) {
-    pool.query('DELETE FROM People WHERE id = ?', [id], function (error, results, fields) {
+    pool.query('DELETE FROM People WHERE `id` = ?', [id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -384,7 +406,7 @@ var remove_people = function (id, result) {
 };
 //itemcat
 var get_itemscat = function (result) {
-    pool.query('SELECT * FROM ItemsCat ORDER BY id ASC, parent ASC, `order` ASC', function (error, results, fields) {
+    pool.query('SELECT * FROM ItemsCat ORDER BY `id` ASC, parent ASC, `order` ASC', function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -393,7 +415,7 @@ var get_itemscat = function (result) {
     });
 };
 var get_itemscat_by_parent = function (parentId, result) {
-    pool.query('SELECT * FROM ItemsCat WHERE parent = ? ORDER BY `order`', [parentId], function (error, results, fields) {
+    pool.query('SELECT * FROM ItemsCat WHERE `parent` = ? ORDER BY `order`', [parentId], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -402,7 +424,7 @@ var get_itemscat_by_parent = function (parentId, result) {
     });
 };
 function get_itemscat_by_parent_SYNC(parentId) {
-    var handle = pool.querySync('SELECT * FROM ItemsCat WHERE parent = ? ORDER BY `order`', [parentId]);
+    var handle = pool.querySync('SELECT * FROM ItemsCat WHERE `parent` = ? ORDER BY `order`', [parentId]);
     var results = handle.fetchAllSync();
     return results;
 }
@@ -418,7 +440,7 @@ var add_itemcat = function (parent, order, name, type, people, price, count, res
 };
 var update_itemcat = function (id, parent, order, name, type, people, price, count, result) {
     pool.query(
-            'UPDATE ItemsCat SET parent = ?, order = ?, name = ?, type = ?, people = ?, price = ?, count = ? WHERE id = ?',
+            'UPDATE ItemsCat SET `parent` = ?, `order` = ?, `name` = ?, `type` = ?, `people` = ?, `price` = ?, `count` = ? WHERE `id` = ?',
             [parent, order, name, type, people, price, count, id], function (error, results, fields) {
         if (error) {
             console.log(error);
@@ -428,7 +450,7 @@ var update_itemcat = function (id, parent, order, name, type, people, price, cou
     });
 };
 var remove_itemcat = function (id, result) {
-    pool.query('DELETE FROM ItemsCat WHERE id = ?', [id], function (error, results, fields) {
+    pool.query('DELETE FROM ItemsCat WHERE `id` = ?', [id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -438,7 +460,7 @@ var remove_itemcat = function (id, result) {
 };
 //ticket
 var add_ticket = function (payementMode, items, total, mail, result) {
-    pool.query('INSERT INTO Ticket SET date = now(), ?', {type: payementMode, total: total, mail: mail}, function (error, results) {
+    pool.query('INSERT INTO Ticket SET `date` = now(), ?', {type: payementMode, total: total, mail: mail}, function (error, results) {
         if (error) {
             console.log(error);
             return result(false);
@@ -458,13 +480,13 @@ var add_ticket = function (payementMode, items, total, mail, result) {
 };
 var get_ticket = function (ticketId, result) {
     pool.query(
-            'SELECT * FROM Ticket WHERE id = ?', [ticketId], function (error, results) {
+            'SELECT * FROM Ticket WHERE `id` = ?', [ticketId], function (error, results) {
         if (error) {
             console.log(error);
             return result(false);
         }
         var data = {id: results[0].id, date: results[0].date, mode: results[0].type, total: results[0].total, mail: results[0].mail};
-        pool.query('SELECT * FROM Ticketlines WHERE ticket = ? ORDER BY `id`', [ticketId], function (error, results) {
+        pool.query('SELECT * FROM Ticketlines WHERE `ticket` = ? ORDER BY `id`', [ticketId], function (error, results) {
             if (error) {
                 console.log(error);
                 return result(false);
@@ -478,10 +500,10 @@ var get_ticket = function (ticketId, result) {
 var get_all_tickets = function (limit, offset, sort, order, search, result) {
     pool.query([
         [
-            'SELECT * FROM Ticket WHERE deleted = 0',
+            'SELECT * FROM Ticket WHERE `deleted` = 0',
             'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
         ].join(' '),
-        'SELECT COUNT(*) as total FROM Ticket WHERE deleted = 0'].join(';'), function (error, results, fields) {
+        'SELECT COUNT(*) as total FROM Ticket WHERE `deleted` = 0'].join(';'), function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -490,7 +512,18 @@ var get_all_tickets = function (limit, offset, sort, order, search, result) {
     });
 };
 var remove_tickets = function (ids, result) {
-    pool.query('UPDATE Ticket SET deleted = 1 WHERE id IN ' + ids, function (error, results, fields) {
+    pool.query('UPDATE Ticket SET `deleted` = 1 WHERE `id` IN ' + ids, function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(true);
+    });
+};
+var update_ticket_mail = function (id, mail, result) {
+    pool.query(
+            'UPDATE Ticket SET `mail` = ? WHERE `id` = ?',
+            [mail, id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -518,8 +551,7 @@ var send_ticket = function (ticketId, mail, result) {
                 return result(info);
             }
         });
-    }
-    else
+    } else
     {
         return result("Mail are disabled in config");
     }

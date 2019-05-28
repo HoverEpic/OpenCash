@@ -235,29 +235,57 @@
                             <h4 class="modal-title">Edition</h4>
                         </div>
                         <div class="modal-body">
-                            <div class="form-group">
-                                <label for="exampleInputName">Nom</label>
-                                <input type="text" class="form-control" id="exampleInputName">
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputFile">Personne</label>
-                                <select class="form-control" id="people">
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputFile">Type</label>
-                                <select class="form-control" id="type">
-                                    <option value="0">Catégorie</option>
-                                    <option value="1">Objet</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">Prix (indicatif)</label>
-                                <input type="number" class="form-control" id="price" placeholder="0" disabled>
-                            </div>
-                            <div class="form-group">
-                                <label for="exampleInputEmail1">Nombre</label>
-                                <input type="number" class="form-control" id="count" placeholder="0" disabled>
+                            <ul class="nav nav-tabs" role="tablist">
+                                <li role="presentation" class="active"><a href="#itemCat" aria-controls="itemCat" role="tab" data-toggle="tab">Simple</a></li>
+                                <li role="presentation" class="disabled"><a href="#itemLot" aria-controls="itemLot" role="tab" data-toggle="tab">Lot</a></li>
+                            </ul>
+                            <br>
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane active" id="itemCat">
+                                    <div class="form-group">
+                                        <label for="exampleInputName">Nom</label>
+                                        <input type="text" class="form-control" id="exampleInputName">
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputFile">Personne</label>
+                                        <select class="form-control" id="people">
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputFile">Type</label>
+                                        <select class="form-control" id="type">
+                                            <option value="0">Catégorie</option>
+                                            <option value="1">Objet</option>
+                                            <option value="2">Lot</option>
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Prix (indicatif)</label>
+                                        <input type="number" class="form-control" id="price" placeholder="0" step="0.01" disabled>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="exampleInputEmail1">Stock</label>
+                                        <input type="number" class="form-control" id="count" placeholder="0" disabled>
+                                    </div>
+                                </div>
+                                <div role="tabpanel" class="tab-pane" id="itemLot">
+                                    <ul class="list-group sortable ui-sortable">
+                                    </ul>
+                                    <div class="input-group">
+                                        <div class="input-group-btn" style="width: 60%;">
+                                            <select class="form-control" style="border-top-left-radius: 4px; border-bottom-left-radius: 4px;">
+                                                <option value="0" selected disabled hidden>Selectionner un objet</option>
+                                                <option value="1">Tawashi</option>
+                                                <option value="2">Gratounette cisal</option>
+                                                <option value="3">Essuie tout</option>
+                                            </select>
+                                        </div>
+                                        <input type="number" class="form-control" value="1" title="Nombre par lot">
+                                        <div class="input-group-btn">
+                                            <button type="button" class="btn btn-default">Ajouter</button>
+                                        </div>
+                                    </div><!-- /input-group -->
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -329,14 +357,16 @@
                             <ul class="list-group">
                                 <li class="list-group-item list-group-item-success">Objets</li>
                             </ul>
-                            <div class="input-group">
-                                <span class="input-group-addon" id="basic-addon2">Mode de paiement</span>
-                                <select class="form-control mode" aria-describedby="basic-addon2">
-                                    <option value="0">Espèce</option>
-                                    <option value="1">Chèque</option>
-                                    <option value="2">Carte bleue</option>
-                                </select>
-                            </div>
+                            <fieldset disabled>
+                                <div class="input-group">
+                                    <span class="input-group-addon" id="basic-addon2">Mode de paiement</span>
+                                    <select class="form-control mode" aria-describedby="basic-addon2">
+                                        <option value="0">Espèce</option>
+                                        <option value="1">Chèque</option>
+                                        <option value="2">Carte bleue</option>
+                                    </select>
+                                </div>
+                            </fieldset>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon3">Mail</span>
@@ -698,11 +728,29 @@
                     if (count === "")
                         count = 0;
 
+                    // string to int
+                    level = Number(level);
+                    id = Number(id);
+                    parent = Number(parent);
+                    people = Number(people);
+                    type = Number(type);
+                    price = Number(price);
+                    count = Number(count);
+                    
+                    var parts = [];
+                    $('#itemsModal #itemLot ul').each(function (i, obj) {
+                        var id = $(this).children().attr('data-id');
+                        var count = $(this).children().attr('data-count');
+                        parts[i] = {id: id, count: count};
+                    });
+
                     // save
+                    var data = {id: id, parent: parent, order: order, name: name, people: people, type: type, price: price, count: count, parts: parts};
+                    console.log(data);
                     $.ajax({
                         url: '/addstock',
                         type: 'PUT',
-                        data: JSON.stringify({id: id, parent: parent, order: order, name: name, people: people, type: type, price: price, count}),
+                        data: JSON.stringify(data),
                         contentType: 'application/json',
                         success: function (data) {
                             data = JSON.parse(data);
@@ -710,7 +758,7 @@
                             if (data.error) {
                                 console.log(data.error);
                             } else {
-                                updateLevel(Number(level) + 1, parent, true);
+                                updateLevel(level, parent, true);
                             }
                         }
                     });
@@ -732,17 +780,44 @@
                     $("#itemsModal #type").removeAttr('disabled');
                     $("#itemsModal #price").attr('disabled', true);
                     $("#itemsModal #count").attr('disabled', true);
+                    $("#itemsModal #price").val(0);
+                    $("#itemsModal #count").val(0);
+                    $("#itemsModal .nav-tabs a[href='#itemLot']").parent('li').addClass('disabled');
+                    $("#itemsModal .nav-tabs a[href='#itemCat']").tab('show');
+                    $("#itemsModal #itemLot ul").empty();
+                    $("#itemsModal #itemLot select").val(0);
                 });
 
                 $('#itemsModal #type').change(function (e) {
-                    var select = $("#itemsModal #type option:selected").val();
-                    console.log(select);
-                    if (select === '1') {
-                        $("#itemsModal #price").removeAttr('disabled');
-                        $("#itemsModal #count").removeAttr('disabled');
-                    } else {
-                        $("#itemsModal #price").attr('disabled', true);
-                        $("#itemsModal #count").attr('disabled', true);
+                    var type = $("#itemsModal #type option:selected").val();
+                    type = Number(type);
+                    console.log(type);
+                    switch (type) {
+                        case 0: //category
+                            $("#itemsModal #price").attr('disabled', true);
+                            $("#itemsModal #count").attr('disabled', true);
+                            $("#itemsModal #price").val(0);
+                            $("#itemsModal #count").val(0);
+                            $(".nav-tabs a[href='#itemLot']").parent('li').addClass('disabled');
+                            break;
+                        case 1: //item
+                            $("#itemsModal #price").removeAttr('disabled');
+                            $("#itemsModal #count").removeAttr('disabled');
+                            $(".nav-tabs a[href='#itemLot']").parent('li').addClass('disabled');
+                            break;
+                        case 2: //lot
+                            $("#itemsModal #price").removeAttr('disabled');
+                            $("#itemsModal #count").attr('disabled', true);
+                            $("#itemsModal #count").val(0);
+                            $(".nav-tabs a[href='#itemLot']").parent('li').removeClass('disabled');
+                            break;
+                    }
+                });
+
+                $(".nav-tabs a[data-toggle=tab]").on("click", function (e) {
+                    if ($(this).parent('li').hasClass("disabled")) {
+                        e.preventDefault();
+                        return false;
                     }
                 });
 
@@ -808,6 +883,50 @@
                 $('#ticketsModal').on('show.bs.modal', function (e) {
                     $('#ticketsModal table').bootstrapTable('refresh');
                 });
+
+                $('#ticketModal #sendMail').on("click", function (e) {
+                    var mail = ""; // TODO
+                    $.ajax({
+                        url: '/sendticket',
+                        type: 'POST',
+                        data: JSON.stringify({id: 0, mail: ""}),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            //console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+
+                            }
+                        }
+                    });
+                });
+
+                $('#itemLot button').on("click", function (e) {
+                    //add item to list
+                    var id = $('#itemLot select').val();
+                    id = Number(id);
+                    console.log(id);
+                    if (id === 0) {
+                        e.stopPropagation();
+                        e.preventDefault();
+                        return;
+                    }
+                    var name = $('#itemLot select option:selected').html();
+                    var count = $('#itemLot input').val();
+                    count = Number(count);
+                    var displayName = name;
+                    if (count > 1)
+                        displayName = name + " x" + count;
+                    $('#itemLot ul').append('<li class="list-group-item ui-sortable-handle" data-id=' + id + ' data-count=' + count + ' id="itemPart-' + id + '">' + displayName + ' <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>');
+                    // remove listener
+                    $('#itemLot #itemPart-' + id + ' .glyphicon').on("click", function (e) {
+                        $(this).parent('li').remove();
+                        $('#itemLot #itemPart-' + id + ' .glyphicon').off();
+                    });
+                });
+
             });
             window.operateEvents = {// catch table events here !
                 'click .view': function (e, value, row, index) {
@@ -852,12 +971,18 @@
                 $('.edit_itemcat-' + item.id).on('click', function (e) {
                     $("#itemsModal .modal-title").html("Edition d'une catégorie ou d'un objet");
                     $("#itemsModal #itemId").val(item.id);
+                    $("#itemsModal #level").val(level);
                     $("#itemsModal #exampleInputName").val(item.name);
                     //populate people + select
                     $("#itemsModal #people").val(item.people);
                     $("#itemsModal #type").val(item.type);
                     if (item.type === 1) {
                         $("#itemsModal #price").removeAttr('disabled');
+                        $("#itemsModal #count").removeAttr('disabled');
+                    }
+                    if (item.type === 2) {
+                        $("#itemsModal #price").removeAttr('disabled');
+                        $(".nav-tabs a[href='#itemLot']").parent('li').removeClass('disabled');
                     }
                     $("#itemsModal #price").val(item.price);
                     $("#itemsModal #count").val(item.count);
@@ -954,6 +1079,7 @@
                 ].join('');
             }
             function viewTicket(row) {
+                var canEdit = false;
                 $.ajax({
                     url: '/ticket',
                     type: 'GET',
@@ -971,6 +1097,11 @@
                             if (time.isValid())
                                 time = time.format('DD/MM/YYYY HH:mm');
                             $('#ticketModal .date').val(time);
+                            //paiement mode
+                            if (canEdit)
+                                $('#ticketModal fieldset').removeAttr('disabled');
+                            else
+                                $('#ticketModal fieldset').attr('disabled', true);
                             $('#ticketModal .mode').val(data.mode);
                             $('#ticketModal .mail').val(data.mail);
                             // items
