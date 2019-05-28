@@ -525,12 +525,14 @@ var send_ticket = function (ticketId, mail, result) {
     }
 };
 
-transporter.on('token', token => {
-    console.log('A new access token was generated');
-    console.log('User: %s', token.user);
-    console.log('Access Token: %s', token.accessToken);
-    console.log('Expires: %s', new Date(token.expires));
-});
+if (mailConfig.enable) {
+    transporter.on('token', token => {
+        console.log('A new access token was generated');
+        console.log('User: %s', token.user);
+        console.log('Access Token: %s', token.accessToken);
+        console.log('Expires: %s', new Date(token.expires));
+    });
+}
 
 //send_ticket(function (result) {
 //    console.log(JSON.stringify(result));
