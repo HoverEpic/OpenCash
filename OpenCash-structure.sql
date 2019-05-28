@@ -25,7 +25,7 @@ CREATE TABLE `ItemsCat` (
   `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0: category, 1: item',
   `people` int(11) NOT NULL DEFAULT '-1',
-  `price` float(10,0) NOT NULL DEFAULT '1',
+  `price` float NOT NULL DEFAULT '1',
   `count` int(11) NOT NULL DEFAULT '1',
   `parts` text COMMENT 'if the item have multiple parts ex :"{[{''part'': 2, ''count'': 5}]}"',
   PRIMARY KEY (`id`)
@@ -46,7 +46,7 @@ CREATE TABLE `People` (
 CREATE TABLE `Ticket` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `date` timestamp NOT NULL,
-  `total` float(10,0) NOT NULL DEFAULT '0',
+  `total` float NOT NULL DEFAULT '0',
   `type` mediumint(9) NOT NULL DEFAULT '0' COMMENT '0: especes, 1: cheque, 2: carte',
   `mail` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
