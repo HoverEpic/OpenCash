@@ -8,6 +8,7 @@ const auth = require('basic-auth');
 const xss = require("xss");
 const express = require('express');
 const helmet = require('helmet');
+const nodemailer = require('nodemailer');
 
 var app = express();
 
@@ -26,6 +27,16 @@ app.set('view engine', 'html');
 app.use(helmet());
 app.disable('x-powered-by');
 
+// Mailer
+var mailConfig = config.get('Config.Mail.nodemailer');
+var transporter = null;
+if (mailConfig.enable) {
+    transporter = nodemailer.createTransport({
+        mailConfig
+    });
+}
+
+// database
 var dbConfig = config.get('Config.Mysql');
 var pool = mysql.createPool(dbConfig);
 
@@ -487,6 +498,43 @@ var remove_tickets = function (ids, result) {
         return result(true);
     });
 };
+
+//Mailer function
+var send_ticket = function (ticketId, mail, result) {
+    if (mailConfig.enable) {
+        var mailOptions = {
+            from: mailConfig.from,
+            to: 'johndoe@nowhere.com',
+            subject: mailConfig.subject,
+            //TODO make a html mail template
+            text: 'This is a test mail from OpenCash!'
+        };
+        transporter.sendMail(mailOptions, function (error, info) {
+            if (error) {
+                console.log(error);
+                return result(false);
+            } else {
+                console.log('Email sent: ' + info.response);
+                return result(info);
+            }
+        });
+    }
+    else
+    {
+        return result("Mail are disabled in config");
+    }
+};
+
+transporter.on('token', token => {
+    console.log('A new access token was generated');
+    console.log('User: %s', token.user);
+    console.log('Access Token: %s', token.accessToken);
+    console.log('Expires: %s', new Date(token.expires));
+});
+
+//send_ticket(function (result) {
+//    console.log(JSON.stringify(result));
+//});
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);

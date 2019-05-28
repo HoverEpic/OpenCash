@@ -23,6 +23,22 @@
             "user2": {
                 "password": "pass2"
             }
+        },
+        "Mail": {
+            "enable": true,
+            "nodemailer" : {
+                "service": "gmail",
+                "auth": {
+                    "type": "OAuth2",
+                    "user": "YOUR_GMAIL_ADDRESS",
+                    "clientId": "YOUR_CLIENT_ID",
+                    "clientSecret": "YOUR_CLIENT_SECRET",
+                    "accessToken": "YOUR_ACCESS_TOKEN",
+                    "refreshToken": "YOUR_REFRESH_TOKEN"
+                }
+            },
+            "from": "johndoe@nowhere.com",
+            "subject": "Your OpenCash mail invoice"
         }
     }
 }

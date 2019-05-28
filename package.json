@@ -1,9 +1,9 @@
 {
   "name": "OpenCash",
   "version": "1.0.0",
-  "repository": "",
+  "repository": "https://github.com/HoverEpic/OpenCash",
   "license": "MIT",
-  "description": "",
+  "description": "Easy paiement tracking app",
   "keywords": [
     "util",
     "functional",
@@ -25,6 +25,7 @@
     "helmet": "^3.12.1",
     "mysql": "^2.15.0",
     "ejs": "^2.6.1",
-    "xss": "^1.0.3"
+    "xss": "^1.0.3",
+    "nodemailer": "^6.2.1"
   }
 }
