@@ -470,7 +470,7 @@ var get_all_tickets = function (limit, offset, sort, order, search, result) {
             'SELECT * FROM Ticket WHERE deleted = 0',
             'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
         ].join(' '),
-        'SELECT COUNT(*) as total FROM Ticket'].join(';'), function (error, results, fields) {
+        'SELECT COUNT(*) as total FROM Ticket WHERE deleted = 0'].join(';'), function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);

@@ -71,7 +71,7 @@
                                     <div class="input-group">
                                         <span class="input-group-addon" id="basic-addonItem">Objet </span>
                                         <input type="text" class="form-control" id="item_name" placeholder="Entrer un texte" aria-describedby="basic-addonItem">
-                                        <input type="hidden" id="item_id">
+                                        <input type="hidden" id="item_id" value="0">
                                     </div>
                                     <br>
                                     <div class="input-group">
@@ -146,11 +146,9 @@
                             <div class="panel panel-default" id="mailTicket">
                                 <div class="panel-heading">Envoi du ticket par mail</div>
                                 <div class="panel-body">
-                                    <div class="input-group">
+                                    <div class="form-group">
                                         <input type="email" class="form-control" placeholder="Email">
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button">Go!</button>
-                                        </span>
+                                        <p class="help-block">Sera envoyé à la validation du ticket.</p>
                                     </div><!-- /input-group -->
                                 </div>
                             </div>
@@ -333,12 +331,19 @@
                             </ul>
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon2">Mode de paiement</span>
-                                <input type="text" class="form-control mode" aria-describedby="basic-addon2" readonly>
+                                <select class="form-control mode" aria-describedby="basic-addon2">
+                                    <option value="0">Espèce</option>
+                                    <option value="1">Chèque</option>
+                                    <option value="2">Carte bleue</option>
+                                </select>
                             </div>
                             <br>
                             <div class="input-group">
                                 <span class="input-group-addon" id="basic-addon3">Mail</span>
-                                <input type="text" class="form-control mail" aria-describedby="basic-addon3" readonly>
+                                <input type="text" class="form-control mail" aria-describedby="basic-addon3">
+                                <span class="input-group-btn">
+                                    <button class="btn btn-default" type="button">Envoyer</button>
+                                </span>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -377,7 +382,7 @@
                             // populate people
                             for (let i = 0; i < people.length; i++) {
                                 $("#itemsModal #people").append('<option value = "' + people[i].id + '">' + people[i].name + '</option>');
-                                $("#itemsModal #people").append('<option value = "' + people[i].id + '">' + people[i].name + '</option>');
+                                //$("#itemsModal #people").append('<option value = "' + people[i].id + '">' + people[i].name + '</option>');
                             }
                         }
                     }
@@ -550,17 +555,13 @@
                 });
 
                 $('#reset').on("click", function (e) {
-                    $('#item-prepare #item_name').val('');
-                    $('#item-prepare #item_id').val('');
-                    $('#item-prepare #item_count').val('');
-                    $('#item-prepare #item_price').val('');
+                    resetVente();
                 });
 
                 $('#payement_methods .glyphicon').hide();
                 $('#payement_methods label').on("click", function (e) {
                     $('#payement_methods .glyphicon').hide();
                     $(this).children('span').show();
-                    console.log('test');
                 });
 
                 $('#pay').on("click", function (e) {
@@ -581,23 +582,22 @@
                             return;
                             break;
                     }
-                    console.log("valide ticket :");
                     var items = [];
-                    $('.ticket_item').each(function (i, obj) {
+                    $('#ticket .ticket_item').each(function (i, obj) {
                         var id = $(this).attr('item_id');
                         var name = $(this).attr('item_name');
                         var count = $(this).attr('item_count');
                         var price = $(this).attr('item_price');
                         var tprice = $(this).attr('total_price');
                         items[i] = {id: id, name: name, count: count, price: price};
-                        console.log("- " + name + "(id:" + id + "), " + count + " x " + price + " € (" + tprice + ")");
+                        //console.log("- " + name + "(id:" + id + "), " + count + " x " + price + " € (" + tprice + ")");
                     });
                     var mail = $('#mailTicket input').val();
-                    console.log("Items : " + items);
-                    console.log("Mode : " + payment_mode);
-                    console.log("Mail : " + mail);
-                    console.log("Articles : " + itemTicketCount);
-                    console.log("Total : " + totalTicketPrice + " €");
+                    //console.log("Items : " + items);
+                    //console.log("Mode : " + payment_mode);
+                    //console.log("Mail : " + mail);
+                    //console.log("Articles : " + itemTicketCount);
+                    //console.log("Total : " + totalTicketPrice + " €");
 
                     if (items.length === 0) {
                         return;
@@ -612,7 +612,7 @@
                         contentType: 'application/json',
                         success: function (data) {
                             data = JSON.parse(data);
-                            console.log(data);
+                            //console.log(data);
                             if (data.error) {
                                 console.log(data.error);
                                 alert("Ticket non transmis, verifiez la connection internet !");
@@ -628,6 +628,7 @@
                                 $('#payement_methods #pay').hide();
                                 $('#payement_methods label').attr('disabled', true);
                                 $('#payement_methods #new_ticket').show();
+                                $('#mailTicket input').attr('disabled', true);
                                 e.stopPropagation();
                                 e.preventDefault();
                             }
@@ -647,6 +648,7 @@
                     $('#ticket .ticket_item').remove();
                     $('#ticket #total').remove();
                     $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                    ticketItem = 0;
 
                     //enable modification
                     $(".sortable").sortable("enable");
@@ -656,6 +658,16 @@
                     $('#payement_methods #new_ticket').hide();
                     $('#payement_methods label').attr('disabled', false);
                     $('#payement_methods #pay').show();
+                    $('#mailTicket input').attr('disabled', false);
+                    $('#mailTicket input').val('');
+
+                    //reset payement mode
+                    $('#payement_methods .glyphicon').hide();
+                    $('#payement_methods label').removeClass('active');
+
+                    //reset vente
+                    resetVente();
+
                     e.stopPropagation();
                     e.preventDefault();
                 });
@@ -694,7 +706,7 @@
                         contentType: 'application/json',
                         success: function (data) {
                             data = JSON.parse(data);
-                            console.log(data);
+                            //console.log(data);
                             if (data.error) {
                                 console.log(data.error);
                             } else {
@@ -755,6 +767,8 @@
                     url: '/tickets',
                     method: 'get',
                     sidePagination: 'server',
+                    sortName: 'id',
+                    sortOrder: 'desc',
                     cache: false,
                     height: '',
                     striped: false,
@@ -902,6 +916,12 @@
                     console.log("clean " + levels[i]);
                 }
             }
+            function resetVente() {
+                $('#item-prepare #item_name').val('');
+                $('#item-prepare #item_id').val('');
+                $('#item-prepare #item_count').val('');
+                $('#item-prepare #item_price').val('');
+            }
             function dateFormat(value, row, index) {
                 var time = moment(value);
                 if (time.isValid())
@@ -951,7 +971,7 @@
                             if (time.isValid())
                                 time = time.format('DD/MM/YYYY HH:mm');
                             $('#ticketModal .date').val(time);
-                            $('#ticketModal .mode').val(payementModeFormat(data.mode));
+                            $('#ticketModal .mode').val(data.mode);
                             $('#ticketModal .mail').val(data.mail);
                             // items
                             $('#ticketModal .ticket_item').remove();
