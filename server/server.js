@@ -110,7 +110,7 @@ app.get('/', function (req, res) {
 });
 
 // App
-app.post('/getpeople', function (req, res) {
+app.get('/people', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
             get_people(function (result) {
@@ -124,17 +124,53 @@ app.post('/getpeople', function (req, res) {
             res.status(403).send();
     });
 });
+app.post('/people', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var people = req.body.people;
+            for(let i = 0; i < people.length; i++) {
+                var person = people[i];
+                person.color = person.color.replace('#', '');
+                if (person.hasOwnProperty('id')) { //update
+                    update_people(person.id, person.name, person.color, function(result){
+                        
+                    });
+                } else { //insert
+                    add_people(person.name, person.color, function(result){
+                        
+                    });
+                }
+                console.log(person);
+            }
+        } else
+            res.status(403).send();
+    });
+});
 app.post('/getstock', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
             var parent = req.body.parent;
-            get_itemscat_by_parent(parent, function (result) {
-                if (result)
-                    res.send(JSON.stringify(result));
-                else {
-                    res.send(JSON.stringify({}));
-                }
-            });
+            if (typeof parent === 'undefined' || parent === null || parent === -1) {
+                get_items(function (results) {
+                    if (results) {
+                        var data = [];
+                        for(let i = 0; i < results.length; i++) {
+                            data[results[i].id] = results[i];
+                        }
+                        res.send(JSON.stringify(data));
+                    } else {
+                        res.send(JSON.stringify({}));
+                    }
+                });
+            } else {
+                get_itemscat_by_parent(parent, function (results) {
+                    if (results)
+                        res.send(JSON.stringify(results));
+                    else {
+                        res.send(JSON.stringify({}));
+                    }
+                });
+            }
         } else
             res.status(403).send();
     });
@@ -165,11 +201,12 @@ app.put('/addstock', function (req, res) {
             var people = req.body.people;
             var price = req.body.price;
             var count = req.body.count;
+            var parts = JSON.stringify(req.body.parts);
 
-            console.log(req.body);
+//            console.log(req.body);
 
             if (id !== 0) {
-                update_itemcat(id, parent, order, name, type, people, price, count, function (result) {
+                update_itemcat(id, parent, order, name, type, people, price, count, parts, function (result) {
                     if (result)
                         res.send(JSON.stringify({result: result}));
                     else {
@@ -177,7 +214,7 @@ app.put('/addstock', function (req, res) {
                     }
                 });
             } else {
-                add_itemcat(parent, order, name, type, people, price, count, function (result) {
+                add_itemcat(parent, order, name, type, people, price, count, parts, function (result) {
                     if (result)
                         res.send(JSON.stringify({result: result}));
                     else {
@@ -326,39 +363,32 @@ var getOrderedItems = function (result) {
         var temp = {};
         if (results) {
             temp = results;
-//            console.log(temp.length + " results");
             for (let i = 0; i < temp.length; i++) { // level 0
-
                 var itemcat0 = temp[i];
-                itemcat0.children = [];
-
-                if (itemcat0.parent === 0) {
-//                    console.log(itemcat0.id + " " + itemcat0.name +" is parent");
-                    for (let j = 0; j < temp.length; j++) { // level 1
-                        var itemcat1 = temp[j];
-                        itemcat1['children'] = [];
-                        if (itemcat1.parent === itemcat0.id) {
-//                            console.log(itemcat1.id + " " + itemcat1.name + " is child of " + itemcat0.id);
-//                            console.log(typeof itemcat0.children);
-//                            if (typeof itemcat0.children !== 'Array')
-//                                itemcat0.children = [];
-                            itemcat0.children.push(itemcat1);
-                        }
-                        for (let k = 0; k < temp.length; k++) { // level 2
-                            var itemcat2 = temp[k];
-                            if (itemcat2.parent === itemcat1.id) {
-//                                console.log(itemcat2.id + " " + itemcat2.name + " is child of " + itemcat1.id);
-//                                itemcat1['children'] = [];
-                                itemcat1['children'].push(itemcat2);
+                if (temp[i] !== null) {
+                    itemcat0.children = [];
+                    if (itemcat0.parent === 0) {
+                        for (let j = i + 1; j < temp.length; j++) { // level 1
+                            var itemcat1 = temp[j];
+                            if (temp[j] !== null) {
+                                itemcat1['children'] = [];
+                                if (itemcat1.parent === itemcat0.id) {
+                                    itemcat0.children.push(itemcat1);
+                                }
                             }
-
+                            for (let k = j + 1; k < temp.length; k++) { // level 2
+                                var itemcat2 = temp[k];
+                                if (temp[k] !== null) {
+                                    if (itemcat2.parent === itemcat1.id) {
+                                        itemcat1['children'].push(itemcat2);
+                                    }
+                                }
+                            }
                         }
+                        stock.push(itemcat0);
                     }
-                    stock.push(itemcat0);
                 }
             }
-//            console.log(stock.length + " parents");
-//            console.log(JSON.stringify(stock));
             return result(stock);
         } else
             return result(false);
@@ -377,8 +407,8 @@ var get_people = function (result) {
         return result(results);
     });
 };
-var add_people = function (name, color, color2, result) {
-    pool.query('INSERT INTO People SET ?', {name: name, color: color, color2: color2}, function (error, results, fields) {
+var add_people = function (name, color, result) {
+    pool.query('INSERT INTO People SET ?', {name: name, color: color}, function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -386,8 +416,8 @@ var add_people = function (name, color, color2, result) {
         return result(true);
     });
 };
-var update_people = function (id, name, color, color2, result) {
-    pool.query('UPDATE People SET `name` = ?, `color` = ?, `color2` = ? WHERE id = ?', [name, color, color2, id], function (error, results, fields) {
+var update_people = function (id, name, color, result) {
+    pool.query('UPDATE People SET `name` = ?, `color` = ? WHERE id = ?', [name, color, id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -428,9 +458,17 @@ function get_itemscat_by_parent_SYNC(parentId) {
     var results = handle.fetchAllSync();
     return results;
 }
-;
-var add_itemcat = function (parent, order, name, type, people, price, count, result) {
-    pool.query('INSERT INTO ItemsCat SET ?', {parent: parent, order: order, name: name, type: type, people: people, price: price, count: count}, function (error, results, fields) {
+var get_items = function (result) {
+    pool.query('SELECT * FROM ItemsCat WHERE `type` = ? ORDER BY `id` ASC', [1], function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};;
+var add_itemcat = function (parent, order, name, type, people, price, count, parts, result) {
+    pool.query('INSERT INTO ItemsCat SET ?', {parent: parent, order: order, name: name, type: type, people: people, price: price, count: count, parts: parts}, function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -438,10 +476,10 @@ var add_itemcat = function (parent, order, name, type, people, price, count, res
         return result(true);
     });
 };
-var update_itemcat = function (id, parent, order, name, type, people, price, count, result) {
+var update_itemcat = function (id, parent, order, name, type, people, price, count, parts, result) {
     pool.query(
-            'UPDATE ItemsCat SET `parent` = ?, `order` = ?, `name` = ?, `type` = ?, `people` = ?, `price` = ?, `count` = ? WHERE `id` = ?',
-            [parent, order, name, type, people, price, count, id], function (error, results, fields) {
+            'UPDATE ItemsCat SET `parent` = ?, `order` = ?, `name` = ?, `type` = ?, `people` = ?, `price` = ?, `count` = ?, `parts` = ? WHERE `id` = ?',
+            [parent, order, name, type, people, price, count, parts, id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
