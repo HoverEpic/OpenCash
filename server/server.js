@@ -9,6 +9,9 @@ const xss = require("xss");
 const express = require('express');
 const helmet = require('helmet');
 const nodemailer = require('nodemailer');
+const fs = require('fs');
+const mime = require('mime');
+const dateFormat = require('dateformat');
 
 var app = express();
 
@@ -378,6 +381,47 @@ app.post('/sendticket', function (req, res) {
                         });
                 });
 
+            }
+        } else
+            res.status(403).send();
+    });
+});
+app.get('/backup', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var download = req.query.download;
+            if (typeof download === 'undefined') {
+                var spawn = require('child_process').spawn;
+                var date = dateFormat(new Date(), "yyyy-mm-dd_hh-MM-ss");
+                var file = "opencash_" + date + ".sql";
+                var wstream = fs.createWriteStream(file);
+                var mysqldump = spawn('mysqldump', [
+                    '--opt',
+                    '--host=' + dbConfig.host,
+                    '--user=' + dbConfig.user,
+                    '--password=' + dbConfig.password,
+                    dbConfig.database
+                ]);
+
+                mysqldump
+                        .stdout
+                        .pipe(wstream)
+                        .on('finish', function () {
+                            res.send(JSON.stringify({download: file}));
+                        })
+                        .on('error', function (err) {
+                            res.send(JSON.stringify({error: err}));
+                        });
+            } else {
+                //res.download("${__dirname}", download);
+                var filename = path.basename(download);
+                var mimetype = mime.lookup(download);
+
+                res.setHeader('Content-disposition', 'attachment; filename=' + filename);
+                res.setHeader('Content-type', mimetype);
+
+                var filestream = fs.createReadStream(download);
+                filestream.pipe(res);
             }
         } else
             res.status(403).send();

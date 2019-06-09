@@ -48,6 +48,7 @@
                             <ul class="dropdown-menu">
                                 <li><a href="#" data-toggle="modal" data-target="#personnesModal">Personnes</a></li>
                                 <li><a href="#" data-toggle="modal" data-target="#stockModal">Stock</a></li>
+                                <li><a href="#" id="backupDatabase">Sauvegarder la base</a></li>
                                 <!--<li><a href="#">Aide</a></li>-->
                                 <!--<li><a href="#">Déconnexion</a></li>-->
                             </ul>
@@ -780,7 +781,7 @@
                     loadStock();
                     activeLevel = [];
                 });
-                
+
                 $('#stockModal #profile  table').bootstrapTable({//http://bootstrap-table.wenzhixin.net.cn/documentation/
                     classes: 'table table-hover table-condensed table-responsive',
                     toolbar: "#toolbar",
@@ -993,6 +994,10 @@
                     //console.log(persons);
                 });
 
+            });
+            // Sauvegarde de la base de donnée
+            $('#backupDatabase').on('click', function (e) {
+                backupDatabase();
             });
             window.operateEvents = {// catch table events here !
                 'click .view': function (e, value, row, index) {
@@ -1271,44 +1276,44 @@
             }
             function editItemCat(item, level) {
                 $("#itemsModal .modal-title").html("Edition d'une catégorie ou d'un objet");
-                    //console.log(item);
-                    $("#itemsModal #itemId").val(item.id);
-                    $("#itemsModal #level").val(level);
-                    $("#itemsModal #parentItemId").val(item.parent);
-                    $("#itemsModal #exampleInputName").val(item.name);
-                    //populate people + select
-                    $("#itemsModal #people").val(item.people);
-                    $("#itemsModal #type").val(item.type);
-                    if (item.type === 1) {
-                        $("#itemsModal #price").removeAttr('disabled');
-                        $("#itemsModal #count").removeAttr('disabled');
-                    }
-                    if (item.type === 2) {
-                        $("#itemsModal #price").removeAttr('disabled');
-                        $(".nav-tabs a[href='#itemLot']").parent('li').removeClass('disabled');
-                        if (item.parts !== null && item.parts.length > 0) {
-                            if (typeof item.parts !== 'object')
-                                item.parts = JSON.parse(item.parts);
-                            for (let i = 0; i < item.parts.length; i++) {
-                                if (typeof stock[item.parts[i].id] !== 'undefined' && stock[item.parts[i].id].hasOwnProperty('id') && stock[item.parts[i].id].hasOwnProperty('name') && stock[item.parts[i].id].hasOwnProperty('count')) {
-                                    var name = stock[item.parts[i].id].name;
-                                    var displayName = name;
-                                    if (item.parts[i].count > 1)
-                                        displayName = name + " x" + item.parts[i].count;
-                                    $('#itemLot ul').append('<li class="list-group-item ui-sortable-handle" data-id=' + item.parts[i].id + ' data-count=' + item.parts[i].count + ' id="itemPart-' + item.parts[i].id + '">' + displayName + ' <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>');
-                                    // remove listener
-                                    $('#itemLot #itemPart-' + item.parts[i].id + ' .glyphicon').on("click", function (e) {
-                                        $(this).parent('li').remove();
-                                        $('#itemLot #itemPart-' + item.parts[i].id + ' .glyphicon').off();
-                                    });
-                                }
+                //console.log(item);
+                $("#itemsModal #itemId").val(item.id);
+                $("#itemsModal #level").val(level);
+                $("#itemsModal #parentItemId").val(item.parent);
+                $("#itemsModal #exampleInputName").val(item.name);
+                //populate people + select
+                $("#itemsModal #people").val(item.people);
+                $("#itemsModal #type").val(item.type);
+                if (item.type === 1) {
+                    $("#itemsModal #price").removeAttr('disabled');
+                    $("#itemsModal #count").removeAttr('disabled');
+                }
+                if (item.type === 2) {
+                    $("#itemsModal #price").removeAttr('disabled');
+                    $(".nav-tabs a[href='#itemLot']").parent('li').removeClass('disabled');
+                    if (item.parts !== null && item.parts.length > 0) {
+                        if (typeof item.parts !== 'object')
+                            item.parts = JSON.parse(item.parts);
+                        for (let i = 0; i < item.parts.length; i++) {
+                            if (typeof stock[item.parts[i].id] !== 'undefined' && stock[item.parts[i].id].hasOwnProperty('id') && stock[item.parts[i].id].hasOwnProperty('name') && stock[item.parts[i].id].hasOwnProperty('count')) {
+                                var name = stock[item.parts[i].id].name;
+                                var displayName = name;
+                                if (item.parts[i].count > 1)
+                                    displayName = name + " x" + item.parts[i].count;
+                                $('#itemLot ul').append('<li class="list-group-item ui-sortable-handle" data-id=' + item.parts[i].id + ' data-count=' + item.parts[i].count + ' id="itemPart-' + item.parts[i].id + '">' + displayName + ' <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>');
+                                // remove listener
+                                $('#itemLot #itemPart-' + item.parts[i].id + ' .glyphicon').on("click", function (e) {
+                                    $(this).parent('li').remove();
+                                    $('#itemLot #itemPart-' + item.parts[i].id + ' .glyphicon').off();
+                                });
                             }
                         }
                     }
-                    $("#itemsModal #price").val(item.price);
-                    $("#itemsModal #count").val(item.count);
+                }
+                $("#itemsModal #price").val(item.price);
+                $("#itemsModal #count").val(item.count);
 
-                    $("#itemsModal").modal('show');
+                $("#itemsModal").modal('show');
             }
             function dateFormat(value, row, index) {
                 var time = moment(value);
@@ -1342,8 +1347,7 @@
                 ].join('');
             }
             function peopleFormat(value, row, index) {
-                console.log(people);
-                for(let i = 0; i < people.length; i++) {
+                for (let i = 0; i < people.length; i++) {
                     if (people[i] && people[i].id === row.people) {
                         return "<span style='color: #" + people[i].color + "'>" + people[i].name + "</span>";
                     }
@@ -1374,11 +1378,9 @@
                     contentType: 'application/json',
                     success: function (data) {
                         data = JSON.parse(data);
-                        //console.log(data);
                         if (data.error) {
                             console.log(data.error);
                         } else {
-                            //console.log(data);
                             $('#ticketModal .modal-title span').html(data.id);
                             var time = moment(data.date);
                             if (time.isValid())
@@ -1421,6 +1423,23 @@
                                 values: ids
                             });
                             $('#ticketsModal table').bootstrapTable('refresh');
+                        }
+                    }
+                });
+            }
+            function backupDatabase() {
+                $.ajax({
+                    url: '/backup',
+                    type: 'GET',
+                    contentType: 'application/json',
+                    success: function (data) {
+                        data = JSON.parse(data);
+                        //console.log(data);
+                        if (data.error) {
+                            console.log(data.error);
+                        } else {
+                            var download = data.download;
+                            window.open('/backup?download=' + download, '_blank');
                         }
                     }
                 });
