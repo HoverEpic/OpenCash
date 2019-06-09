@@ -175,6 +175,28 @@ app.post('/getstock', function (req, res) {
             res.status(403).send();
     });
 });
+
+app.get('/getstock', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var limit = req.query.limit || 10;
+            var offset = req.query.offset || 0;
+            var order = req.query.order || 'asc';
+            var sort = req.query.sort || 'id';
+            var search = req.query.search || '';
+            get_all_items(limit, offset, order.toUpperCase(), sort, search, function (results) {
+                var rows = [];
+                var total = 100;
+                if (results) {
+                    rows = results[0];
+                    total = results[1][0].total;
+                }
+                res.send(JSON.stringify({rows: rows, total: total}));
+            });
+        } else
+            res.status(403).send();
+    });
+});
 app.get('/getAllStock', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
@@ -486,6 +508,20 @@ var get_itemscat_by_id = function (id, result) {
 };
 var get_itemscat_by_parent = function (parentId, result) {
     pool.query('SELECT * FROM ItemsCat WHERE `parent` = ? ORDER BY `order`', [parentId], function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};
+var get_all_items = function (limit, offset, sort, order, search, result) {
+    pool.query([
+        [
+            'SELECT * FROM ItemsCat WHERE `type` = 1',
+            'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
+        ].join(' '),
+        'SELECT COUNT(*) as total FROM ItemsCat WHERE `type` = 1'].join(';'), function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
