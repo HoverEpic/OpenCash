@@ -128,16 +128,16 @@ app.post('/people', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
             var people = req.body.people;
-            for(let i = 0; i < people.length; i++) {
+            for (let i = 0; i < people.length; i++) {
                 var person = people[i];
                 person.color = person.color.replace('#', '');
                 if (person.hasOwnProperty('id')) { //update
-                    update_people(person.id, person.name, person.color, function(result){
-                        
+                    update_people(person.id, person.name, person.color, function (result) {
+
                     });
                 } else { //insert
-                    add_people(person.name, person.color, function(result){
-                        
+                    add_people(person.name, person.color, function (result) {
+
                     });
                 }
                 console.log(person);
@@ -154,7 +154,7 @@ app.post('/getstock', function (req, res) {
                 get_items(function (results) {
                     if (results) {
                         var data = [];
-                        for(let i = 0; i < results.length; i++) {
+                        for (let i = 0; i < results.length; i++) {
                             data[results[i].id] = results[i];
                         }
                         res.send(JSON.stringify(data));
@@ -244,13 +244,44 @@ app.post('/deleteStock', function (req, res) {
 app.put('/ticket', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
+//            console.log(req.body.items);
             var mode = req.body.mode;
             var items = req.body.items;
             var mail = req.body.mail;
             var total = 0;
             for (let i = 0; i < items.length; i++) {
                 let item = items[i];
-                total = total + item.price;
+                total = total + (item.count * Number(item.price));
+
+                get_itemscat_by_id(item.id, function (result) {
+                    if (result) {
+//                        console.log(result);
+                        if (result.type === 1) { //item
+//                            console.log("type = 1");
+                            decrement_itemcat_stock(item.id, item.count, function (result1) {
+                                console.log("decrement " + item.name + " -" + item.count);
+                            });
+                        } else if (result.type === 2) { //lot
+//                            console.log("type = 2");
+                            result.parts = JSON.parse(result.parts);
+//                            console.log("parts = " + result.parts.length);
+                            for (let j = 0; j < result.parts.length; j++) {
+                                get_itemscat_by_id(result.parts[j].id, function (result2) {
+                                    if (result2) {
+//                                        console.log(result2);
+                                        if (result2.type === 1) { //item
+                                            decrement_itemcat_stock(result2.id, result.parts[j].count * item.count, function (result3) {
+                                                console.log("decrement " + result2.name + " -" + result.parts[j].count * item.count);
+                                            });
+                                        }
+                                    }
+                                });
+                            }
+                        } else {
+                            console.log("type = " + result.type);
+                        }
+                    }
+                });
             }
             add_ticket(mode, items, total, mail, function (result) {
                 if (result) {
@@ -320,13 +351,13 @@ app.post('/sendticket', function (req, res) {
             var id = req.body.id;
             var mail = req.body.mail;
             if (mail !== null || mail !== "") {
-                update_ticket_mail(mail, id, function(result_update) {
+                update_ticket_mail(mail, id, function (result_update) {
                     if (result_update)
                         send_ticket(id, mail, function (mail_result) {
                             res.send(JSON.stringify({mail: mail_result}));
                         });
                 });
-                
+
             }
         } else
             res.status(403).send();
@@ -444,6 +475,17 @@ var get_itemscat = function (result) {
         return result(results);
     });
 };
+var get_itemscat_by_id = function (id, result) {
+    pool.query('SELECT * FROM ItemsCat WHERE `id` = ?', [id], function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        if (results.length === 1)
+            return result(results[0]);
+        return result(results);
+    });
+};
 var get_itemscat_by_parent = function (parentId, result) {
     pool.query('SELECT * FROM ItemsCat WHERE `parent` = ? ORDER BY `order`', [parentId], function (error, results, fields) {
         if (error) {
@@ -453,11 +495,6 @@ var get_itemscat_by_parent = function (parentId, result) {
         return result(results);
     });
 };
-function get_itemscat_by_parent_SYNC(parentId) {
-    var handle = pool.querySync('SELECT * FROM ItemsCat WHERE `parent` = ? ORDER BY `order`', [parentId]);
-    var results = handle.fetchAllSync();
-    return results;
-}
 var get_items = function (result) {
     pool.query('SELECT * FROM ItemsCat WHERE `type` = ? ORDER BY `id` ASC', [1], function (error, results, fields) {
         if (error) {
@@ -466,7 +503,7 @@ var get_items = function (result) {
         }
         return result(results);
     });
-};;
+};
 var add_itemcat = function (parent, order, name, type, people, price, count, parts, result) {
     pool.query('INSERT INTO ItemsCat SET ?', {parent: parent, order: order, name: name, type: type, people: people, price: price, count: count, parts: parts}, function (error, results, fields) {
         if (error) {
@@ -480,6 +517,15 @@ var update_itemcat = function (id, parent, order, name, type, people, price, cou
     pool.query(
             'UPDATE ItemsCat SET `parent` = ?, `order` = ?, `name` = ?, `type` = ?, `people` = ?, `price` = ?, `count` = ?, `parts` = ? WHERE `id` = ?',
             [parent, order, name, type, people, price, count, parts, id], function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(true);
+    });
+};
+var decrement_itemcat_stock = function (id, decrement, result) {
+    pool.query('UPDATE ItemsCat SET `count` = `count` - ? WHERE `id` = ?', [decrement, id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -517,8 +563,7 @@ var add_ticket = function (payementMode, items, total, mail, result) {
     });
 };
 var get_ticket = function (ticketId, result) {
-    pool.query(
-            'SELECT * FROM Ticket WHERE `id` = ?', [ticketId], function (error, results) {
+    pool.query('SELECT * FROM Ticket WHERE `id` = ?', [ticketId], function (error, results) {
         if (error) {
             console.log(error);
             return result(false);

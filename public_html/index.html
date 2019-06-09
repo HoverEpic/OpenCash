@@ -493,7 +493,7 @@
                         $('#ticket .badge').html(itemTicketCount);
                         totalTicketPrice -= removePrice;
                         $('#ticket #total').remove();
-                        $('#ticket ul').append('<li class="list-group-item list-group-item-success" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                        $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
                         $(this).parent('li').remove();
                         $('#ticket #ticketItem-' + ticketItem + ' .glyphicon').off();
                         e.stopPropagation();
@@ -504,6 +504,8 @@
                     $('#ticket .badge').html(itemTicketCount);
                     //update total
                     $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                    // reset vente
+                    resetVente();
                     e.stopPropagation();
                     e.preventDefault();
                 });
@@ -572,7 +574,7 @@
                                 alert("Ticket non transmis, verifiez la connection internet !");
                             } else {
                                 var ticketId = data.result;
-                                console.log("Ticket Id : " + ticketId);
+                                //console.log("Ticket Id : " + ticketId);
                                 $('#ticketId').html(" #" + ticketId);
                                 //disable modification
                                 $(".sortable").sortable("disable");
@@ -618,6 +620,9 @@
                     //reset payement mode
                     $('#payement_methods .glyphicon').hide();
                     $('#payement_methods label').removeClass('active');
+                    
+                    //update stock
+                    loadStock();
 
                     //reset vente
                     resetVente();
@@ -668,7 +673,7 @@
 
                     // save
                     var data = {id: id, parent: parent, order: order, name: name, people: people, type: type, price: price, count: count, parts: parts};
-                    console.log(data);
+                    //console.log(data);
                     $.ajax({
                         url: '/addstock',
                         type: 'PUT',
@@ -713,7 +718,7 @@
                 $('#itemsModal #type').change(function (e) {
                     var type = $("#itemsModal #type option:selected").val();
                     type = Number(type);
-                    console.log(type);
+                    //console.log(type);
                     switch (type) {
                         case 0: //category
                             $("#itemsModal #price").attr('disabled', true);
@@ -831,7 +836,7 @@
                     //add item to list
                     var id = $('#itemLot select').val();
                     id = Number(id);
-                    console.log(id);
+                    //console.log(id);
                     if (id === 0) {
                         e.stopPropagation();
                         e.preventDefault();
@@ -920,7 +925,7 @@
                             }
                         }
                     });
-                    console.log(persons);
+                    //console.log(persons);
                 });
 
             });
@@ -958,7 +963,7 @@
                                 $("#li" + itemcat0.id).append('<div style="display: inline"></div>');
                                 //console.log("categorie : " + itemcat0.name + " type : " + itemcat0.type);
                                 if (itemcat0.type === 1 || itemcat0.type === 2) { // item/pack
-                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default item" type="button" item_id="' + itemcat0.id + '" item_name="' + itemcat0.name + '" item_price="' + itemcat0.price + '" style="border-color: #' + color + '">' + itemcat0.name + '</button>');
+                                    $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default item" type="button" item_id="' + itemcat0.id + '" item_name="' + itemcat0.name + '" item_price="' + itemcat0.price + '" style="border-color: #' + color + ';' + (itemcat0.type === 1 && itemcat0.count <= 0 ? ' color: red;' : '') + '">' + itemcat0.name + '</button>');
                                 } else { //category
                                     $("#li" + itemcat0.id + " div:first").append('<button class="btn btn-default" id="drop' + itemcat0.id + '" data-toggle="dropdown" style="border-color: #' + color + '">' + itemcat0.name + ' <span class="caret"></span></button>');
                                     $("#li" + itemcat0.id + " div:first").append('<ul class="dropdown-menu" id="ul' + itemcat0.id + '" aria-labelledby="drop' + itemcat0.id + '"></ul>');
@@ -971,7 +976,7 @@
                                             $("#ul" + itemcat0.id).append('<li class="dropdown-submenu"></li>');
                                             //console.log("\tsous categorie : " + itemcat1.name);
                                             if (itemcat1.type === 1 || itemcat1.type === 2) { // item/pack
-                                                $("#li" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" class="item" item_id="' + itemcat1.id + '" item_name="' + itemcat1.name + '" item_price="' + itemcat1.price + '">' + itemcat1.name + '</a>');
+                                                $("#li" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" class="item"' + (itemcat1.type === 1 && itemcat1.count <= 0 ? ' style="color: red;"' : '') + ' item_id="' + itemcat1.id + '" item_name="' + itemcat1.name + '" item_price="' + itemcat1.price + '">' + itemcat1.name + '</a>');
                                             } else { //category
                                                 $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<a href="#" tabindex="-1" id="drop' + itemcat1.id + '" data-toggle="dropdown">' + itemcat1.name + ' <span class="caret"></span></a>');
                                                 $("#ul" + itemcat0.id + " .dropdown-submenu:first").append('<ul class="dropdown-menu" id="ul' + itemcat1.id + '" aria-labelledby="drop' + itemcat1.id + '"></ul>');
@@ -982,7 +987,7 @@
                                                     for (let k = 0; k < itemcat1.children.length; k++) { //level 2
                                                         var itemcat2 = itemcat1.children[k];
                                                         //console.log("\t\tobjet : " + itemcat2.name);
-                                                        $("#ul" + itemcat1.id).append('<li><a href="#" class="item" item_id="' + itemcat2.id + '" item_name="' + itemcat2.name + '" item_price="' + itemcat2.price + '">' + itemcat2.name + '</a></li>');
+                                                        $("#ul" + itemcat1.id).append('<li><a href="#" class="item"' + (itemcat2.type === 1 && itemcat2.count <= 0 ? ' style="color: red;"' : '') + ' item_id="' + itemcat2.id + '" item_name="' + itemcat2.name + '" item_price="' + itemcat2.price + '">' + itemcat2.name + '</a></li>');
                                                     }
                                                 }
                                             }
@@ -1030,7 +1035,7 @@
                     contentType: 'application/json',
                     success: function (data) {
                         data = JSON.parse(data);
-                        console.log(data);
+                        //console.log(data);
                         if (data.error) {
                             console.log(data.error);
                         } else {
@@ -1212,7 +1217,7 @@
                                     activeLevel[level] = null;
                                     cleanLevels([level, level + 1]);
                                 }
-                                console.log("activeLevel " + level + " " + activeLevel[level]);
+                                //console.log("activeLevel " + level + " " + activeLevel[level]);
                             }
                         }
                     });
@@ -1278,7 +1283,7 @@
                         if (data.error) {
                             console.log(data.error);
                         } else {
-                            console.log(data);
+                            //console.log(data);
                             $('#ticketModal .modal-title span').html(data.id);
                             var time = moment(data.date);
                             if (time.isValid())
