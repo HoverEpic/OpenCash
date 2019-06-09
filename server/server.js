@@ -203,8 +203,6 @@ app.put('/addstock', function (req, res) {
             var count = req.body.count;
             var parts = JSON.stringify(req.body.parts);
 
-//            console.log(req.body);
-
             if (id !== 0) {
                 update_itemcat(id, parent, order, name, type, people, price, count, parts, function (result) {
                     if (result)

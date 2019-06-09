@@ -17,6 +17,9 @@
                 left: 100%;
                 margin-top: -1px;
             }
+            .dropdown-submenu a {
+                background-color: #fff;;
+            }
             /*make the colorpicker on top of bootstrap modals */
             .colorpicker {
                 z-index: 9999;
@@ -620,7 +623,7 @@
                     //reset payement mode
                     $('#payement_methods .glyphicon').hide();
                     $('#payement_methods label').removeClass('active');
-                    
+
                     //update stock
                     loadStock();
 
@@ -694,6 +697,27 @@
                     $("#itemsModal").modal('hide');
                     e.stopPropagation();
                     e.preventDefault();
+                });
+
+                $('#itemsModal .delete').on("click", function (e) {
+                    var level = $("#itemsModal #level").val();
+                    var id = $("#itemsModal #itemId").val(); //if 0 => insert, if not => update
+                    var parent = $("#itemsModal #parentItemId").val();
+                    $.ajax({
+                        url: '/deleteStock',
+                        type: 'POST',
+                        data: JSON.stringify({id: id}),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            //console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                updateLevel(level, parent, true);
+                            }
+                        }
+                    });
                 });
 
                 $('#itemsModal').on('hidden.bs.modal', function (e) {
@@ -994,35 +1018,36 @@
                                         }
                                     }
                                 }
-                                // category listener
-                                $(".dropdown button").on('hide.bs.dropdown', function () {
-                                    if (lastStockDropdown !== null) {
-                                        lastStockDropdown.toggle(); // close last dropdown if not closed
-                                        lastStockDropdown = null;
-                                    }
-                                });
-                                $(".dropdown-submenu a").on("click", function (e) {
-                                    if (lastStockDropdown !== null) {
-                                        lastStockDropdown.toggle(); // close last dropdown if not closed
-                                        lastStockDropdown = null;
-                                    }
-                                    lastStockDropdown = $(this).next('ul');
-                                    $(this).next('ul').toggle();
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                });
-                                //here add item listener
-                                $('#stock .item').on("click", function (e) {
-                                    var itemPrice = $(this).attr('item_price');
-                                    var itemName = $(this).attr('item_name');
-                                    var itemId = $(this).attr('item_id');
-                                    $('#item-prepare #item_name').val(itemName);
-                                    $('#item-prepare #item_price').val(itemPrice);
-                                    $('#item-prepare #item_id').val(itemId);
-                                    e.stopPropagation();
-                                    e.preventDefault();
-                                });
                             }
+                            // category listener
+                            $(".dropdown button").on('hide.bs.dropdown', function () {
+                                if (lastStockDropdown !== null) {
+                                    lastStockDropdown.toggle(); // close last dropdown if not closed
+                                    lastStockDropdown = null;
+                                }
+                            });
+                            $(".dropdown-submenu a").on("click", function (e) {
+                                if (lastStockDropdown !== null) {
+                                    lastStockDropdown.toggle(); // close last dropdown if not closed
+                                    lastStockDropdown = null;
+                                }
+                                lastStockDropdown = $(this).next('ul');
+                                $(this).next('ul').toggle();
+                                e.stopPropagation();
+                                e.preventDefault();
+                            });
+                            //here add item listener
+                            $('#stock .item').on("click", function (e) {
+                                var itemPrice = $(this).attr('item_price');
+                                var itemName = $(this).attr('item_name');
+                                var itemId = $(this).attr('item_id');
+                                $('#stock .item').dropdown('toggle');
+                                $('#item-prepare #item_name').val(itemName);
+                                $('#item-prepare #item_price').val(itemPrice);
+                                $('#item-prepare #item_id').val(itemId);
+                                e.stopPropagation();
+                                e.preventDefault();
+                            });
                         }
                     }
                 });
@@ -1045,7 +1070,6 @@
                                     $('#itemLot select').append('<option value="' + data[i].id + '">' + data[i].name + '</option>');
                                 }
                             }
-
                         }
                     }
                 });
@@ -1138,7 +1162,7 @@
                 //listener
                 $('.edit_itemcat-' + item.id).on('click', function (e) {
                     $("#itemsModal .modal-title").html("Edition d'une catégorie ou d'un objet");
-                    console.log(item);
+                    //console.log(item);
                     $("#itemsModal #itemId").val(item.id);
                     $("#itemsModal #level").val(level);
                     $("#itemsModal #parentItemId").val(item.parent);
@@ -1226,7 +1250,7 @@
                 });
             }
             function addPerson(person) {
-                
+
             }
             function cleanLevels(levels) {
                 for (let i; i > levels.length; i++) {
