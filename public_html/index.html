@@ -9,6 +9,9 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.12.1/bootstrap-table.min.css">
         <link rel="stylesheet" media="screen" type="text/css" href="https://www.eyecon.ro/colorpicker/css/colorpicker.css" />
         <style>
+            #itemCatArea .btn {
+                border: 3px solid transparent;
+            }
             .dropdown-submenu {
                 position: relative;
             }
@@ -305,19 +308,49 @@
                             <h4 class="modal-title">Personnes</h4>
                         </div>
                         <div class="modal-body">
-                            <ul class="list-group">
-                            </ul>
+                            <table></table>
+                            <br>
+                            <button type="button" class="btn btn-default" data-toggle="modal" data-target="#personModal">Ajouter</button>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Personn modal -->
+            <div class="modal fade" tabindex="-1" role="dialog" id="personModal">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                            <h4 class="modal-title">Person</h4>
+                        </div>
+                        <div class="modal-body">
+                            <input type="hidden" id="personId" value="0"/>
+                            <div class="form-group">
+                                <label for="name">Nom</label>
+                                <input type="text" class="form-control" id="name">
+                            </div>
+                            <div class="form-group">
+                                <label for="mail">Mail</label>
+                                <input type="text" class="form-control" id="mail">
+                            </div>
+                            <div class="form-group">
+                                <label for="mail">Mot de passe</label>
+                                <input type="password" class="form-control" id="password">
+                            </div>
                             <div class="input-group">
-                                <input type="text" class="form-control" id="personName" autocomplete="off" placeholder="Nom"/>
-                                <div class="input-group-btn">
+                                <span class="input-group-btn">
                                     <button type="button" class="btn btn-default" style="cursor: default;" id="colorSelector1">
                                         <span class="badge" style="font-size: inherit;" id="color-preview">Couleur</span>
                                     </button>
-                                    <button type="button" class="btn btn-default add">Ajouter</button>
-                                </div>
-                            </div><!-- /input-group -->
+                                </span>
+                                <input type="text" class="form-control" id="color" disabled>
+                            </div>
                         </div>
                         <div class="modal-footer">
+                            <button type="button" class="btn btn-danger pull-left delete" style="display: none;">Supprimer</button>
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
                             <button type="button" class="btn btn-primary save">Save changes</button>
                         </div>
@@ -393,6 +426,7 @@
             var ticketItem = 0;
 
             var people = [];
+            var peopleDeleted = [];
             var stock = [];
             var activeLevel = [];
 
@@ -420,6 +454,7 @@
                     },
                     onChange: function (hsb, hex, rgb) {
                         $('#color-preview').css('backgroundColor', '#' + hex);
+                        $('#color').val('#' + hex);
                     }
                 });
 
@@ -428,7 +463,8 @@
 
                 // sorting ticket items or catégories/items
                 $(".sortable").sortable({
-                    items: "li:not(.unsortable)"
+                    items: "li:not(.unsortable)",
+                    cancel: ".disable-sort"
                 });
                 $(".sortable").disableSelection();
 
@@ -573,7 +609,7 @@
                                 //console.log("Ticket Id : " + ticketId);
                                 $('#ticketId').html(" #" + ticketId);
                                 //disable modification
-                                $(".sortable").sortable("disable");
+                                $(".sortable").children('li').addClass("disable-sort");
                                 $('#ticket .glyphicon').hide();
                                 $('#item-prepare #add_to_ticket').attr('disabled', true);
                                 $('#stock .item_category').attr('disabled', true);
@@ -603,7 +639,7 @@
                     ticketItem = 0;
 
                     //enable modification
-                    $(".sortable").sortable("enable");
+                    //$(".sortable").children('li').addClass("disable-sort");
                     $('#ticket .glyphicon').show();
                     $('#item-prepare #add_to_ticket').attr('disabled', false);
                     $('#stock .item_category').attr('disabled', false);
@@ -709,7 +745,7 @@
                                 console.log(data.error);
                             } else {
                                 updateLevel(level, parent, true);
-                                $('#stockModal #profile  table').bootstrapTable('refresh');
+                                $('#stockModal #profile table').bootstrapTable('refresh');
                             }
                         }
                     });
@@ -782,7 +818,7 @@
                     activeLevel = [];
                 });
 
-                $('#stockModal #profile  table').bootstrapTable({//http://bootstrap-table.wenzhixin.net.cn/documentation/
+                $('#stockModal #profile table').bootstrapTable({//http://bootstrap-table.wenzhixin.net.cn/documentation/
                     classes: 'table table-hover table-condensed table-responsive',
                     toolbar: "#toolbar",
                     url: '/getstock',
@@ -924,76 +960,90 @@
                     $('#itemLot input').val(1);
                 });
 
-                $('#personnesModal').on('hidden.bs.modal', function (e) {
-                    $('#personnesModal .person .add').html('Ajouter');
-                    $('#color-preview').css('background-color', '#333');
-                    $('#personnesModal input').val('');
+                $('#personnesModal table').bootstrapTable({//http://bootstrap-table.wenzhixin.net.cn/documentation/
+                    classes: 'table table-hover table-condensed table-responsive',
+                    toolbar: "#toolbar",
+                    url: '/getpeople',
+                    method: 'get',
+                    sidePagination: 'server',
+                    sortName: 'id',
+                    sortOrder: 'asc',
+                    cache: false,
+                    height: '',
+                    striped: false,
+                    pagination: true,
+                    pageSize: 10,
+                    pageList: [10, 25, 50, 100, 200],
+                    search: false,
+                    searchAlign: 'right',
+                    showColumns: false,
+                    showRefresh: false,
+                    showHeader: true,
+                    minimumCountColumns: 2,
+                    clickToSelect: false,
+                    columns: [
+                        {
+                            field: 'id',
+                            title: 'Id'
+                        }, {
+                            field: 'name',
+                            title: 'Nom'
+                        }, {
+                            field: 'mail',
+                            title: 'Mail'
+                        }, {
+                            field: 'color',
+                            title: 'Couleur',
+                            formatter: colorFormat
+                        }, {
+                            title: 'Actions',
+                            events: operateEvents,
+                            formatter: peopleOptions
+                        }
+                    ]
                 });
-                $('#personnesModal #personName').on('keyup', function (e) {
-                    //$('#personnesModal #color-preview').html($('#personnesModal #personName').val());
+
+                $('#personModal').on('hidden.bs.modal', function (e) {
+                    //reinit modal
+                    $("#personModal .modal-title").html("Ajouter une personne");
+                    $("#personModal #personId").val(0);
+                    $("#personModal #name").val('');
+                    $("#personModal #mail").val('');
+                    $("#personModal #password").val('');
+                    var defColor = "000000";
+                    $('#colorSelector1').ColorPickerSetColor(defColor);
+                    $('#color-preview').css('backgroundColor', '#' + defColor);
+                    $('#color').val('#' + defColor);
+                    $("#personModal .delete").hide();
                 });
-                $('#personnesModal .add').on('click', function (e) {
-                    var name = $('#personnesModal #personName').val();
-                    if (name === '')
-                        return;
-                    var color = $('#personnesModal #color-preview').css('background-color');
-                    color = rgb2hex(color);
-                    var mode = $('#personnesModal .input-group .add').html();
-                    if (mode === 'Ajouter') {
-                        $('#personnesModal ul').append('<li class="list-group-item ui-sortable-handle person"><span class="name" style="color: ' + color + '">' + name + '</span> <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>');
-                        // remove listener
-                        $('#personnesModal .person .remove').on("click", function (e) {
-                            if (confirm("Attention, si vous supprimez un utilisateur ayant des produits, les produits ne resont plus associés à sa couleur.")) {
-                                $(this).parent('li').remove();
-                            } else {
-                                // Code à éxécuter si l'utilisateur clique sur "Annuler"
-                            }
-                        });
-                    } else {
-                        $('#personnesModal .person .add').html('Ajouter');
-                        $('#personnesModal ul li').each(function (i, obj) {
-                            var oldName = $(this).children().html();
-                            var color = $(this).children().css('color');
-                            if (oldName === name) {
-                                $(this).children('.name').html(name);
-                                $(this).children().css('color', '#' + color);
-                            }
-                        });
-                    }
-                    $('#personnesModal .person .add').html('Ajouter');
-                    $('#color-preview').css('background-color', '#333');
-                    $('#personnesModal #personName').val('');
-                });
-                $('#personnesModal .save').on('click', function (e) {
-                    var persons = [];
-                    $('#personnesModal ul li').each(function (i, obj) {
-                        var id = $(this).attr('data-id');
-                        if (typeof id !== 'undefined')
-                            id = Number(id);
-                        var name = $(this).children('.name').html();
-                        var color = $(this).children('.name').css('color');
-                        color = rgb2hex(color);
-                        persons[i] = {id: id, name: name, color: color};
-                    });
+
+                $('#personModal .save').on("click", function (e) {
+                    var id = $("#personModal #personId").val();
+                    var name = $("#personModal #name").val();
+                    var mail = $("#personModal #mail").val();
+                    var pass = $("#personModal #password").val();
+                    var color = $('#color').val().replace("#", "");
+                    id = Number(id);
+                    console.log(pass);
+
                     $.ajax({
                         url: '/people',
-                        type: 'POST',
-                        data: JSON.stringify({people: persons}),
+                        type: 'PUT',
+                        data: JSON.stringify({id: id, name: name, mail: mail, pass: pass, color: color}),
                         contentType: 'application/json',
                         success: function (data) {
                             data = JSON.parse(data);
-                            //console.log(data);
+                            console.log(data);
                             if (data.error) {
                                 console.log(data.error);
                             } else {
-                                $('#personnesModal').modal('hide');
+                                $('#personnesModal table').bootstrapTable('refresh');
+                                $('#personModal').modal('hide');
                                 loadPeople();
                             }
                         }
                     });
-                    //console.log(persons);
                 });
-
             });
             // Sauvegarde de la base de donnée
             $('#backupDatabase').on('click', function (e) {
@@ -1008,6 +1058,9 @@
                 },
                 'click .edit': function (e, value, row, index) {
                     editItemCat(row, -1);
+                },
+                'click .edit-people': function (e, value, row, index) {
+                    editPerson(row);
                 }
             };
             function loadStock() {
@@ -1136,46 +1189,16 @@
                         } else {
                             // clear list before filling
                             $("#itemsModal #people").empty();
-                            $('#personnesModal ul').empty();
                             // populate people
                             for (let i = 0; i < data.result.length; i++) {
                                 people[data.result[i].id] = data.result[i];
-
                                 $("#itemsModal #people").append('<option value = "' + data.result[i].id + '" style="color: #' + data.result[i].color + ';">' + data.result[i].name + '</option>');
-                                $('#personnesModal ul').append('<li class="list-group-item person" data-id=' + data.result[i].id + '  data-name=' + data.result[i].name + '><span class="name" style="color: #' + data.result[i].color + ';">' + data.result[i].name + '</span> <!--<span title="Editer" class="glyphicon glyphicon-pencil pull-right edit"></span>--> <span title="Supprimer" class="glyphicon glyphicon-trash pull-right remove"></span></li>');
-                                // remove listener
-                                $('#personnesModal .person .remove').on("click", function (e) {
-                                    if (confirm("Attention, si vous supprimez un utilisateur ayant des produits, les produits ne resont plus associés a sa couleur.")) {
-                                        $(this).parent('li').remove();
-                                    } else {
-                                        // Code à éxécuter si l'utilisateur clique sur "Annuler"
-                                    }
-                                });
-                                // edit listener TODO
-                                //$('#personnesModal .person .edit').on("click", function (e) {
-                                //    var oldName = $(this).parent('li').attr('data-name');
-                                //    var oldColor = $(this).parent('li').css('color');
-                                //    $('#color-preview').css('background-color', oldColor);
-                                //    $('#personnesModal input').val(oldName);
-                                //    $('#colorSelector1').ColorPickerSetColor(oldColor);
-                                //    console.log(oldColor);
-                                //    $('#personnesModal .input-group .add').html('Editer');
-                                //$('#personnesModal ul li').each(function (i, obj) {
-                                //    var name = $(this).children().html();
-                                //    var color = $(this).children().css('color');
-                                //    if(name === oldName) {
-                                //        $(this).children().html($('#personnesModal input').val());
-                                //        
-                                //    }
-                                //});
-                                //});
                             }
                         }
                     }
                 });
             }
             function updateLevel(level, parent, clean) {
-                console.log(level);
                 if (clean)
                     $('#stockModal #level' + level).empty();
                 $.ajax({
@@ -1252,7 +1275,6 @@
                                     activeLevel[level] = null;
                                     cleanLevels([level, level + 1]);
                                 }
-                                //console.log("activeLevel " + level + " " + activeLevel[level]);
                             }
                         }
                     });
@@ -1315,6 +1337,19 @@
 
                 $("#itemsModal").modal('show');
             }
+            function editPerson(person) {
+                $("#personModal .modal-title").html("Edition de " + person.name);
+                $("#personModal #personId").val(person.id);
+                $("#personModal #name").val(person.name);
+                $("#personModal #mail").val(person.email);
+                if (person.password.length > 0)
+                    $("#personModal #password").val('********');
+                $('#colorSelector1').ColorPickerSetColor(person.color);
+                $('#color-preview').css('backgroundColor', '#' + person.color);
+                $('#color').val('#' + person.color);
+                $("#personModal .delete").show();
+                $("#personModal").modal('show');
+            }
             function dateFormat(value, row, index) {
                 var time = moment(value);
                 if (time.isValid())
@@ -1365,6 +1400,18 @@
             function stockOptions(value, row, index) {
                 return [
                     '<button class="btn btn-default btn-xs edit" title="Editer">',
+                    '<i class="glyphicon glyphicon-pencil"></i> Editer',
+                    '</button> '
+                ].join('');
+            }
+            function colorFormat(value, row, index) {
+                if (value !== null)
+                    return "<span style='color: #" + value + ";'>#" + value + "</span>";
+                return value;
+            }
+            function peopleOptions(value, row, index) {
+                return [
+                    '<button class="btn btn-default btn-xs pull-right edit-people" title="Editer">',
                     '<i class="glyphicon glyphicon-pencil"></i> Editer',
                     '</button> '
                 ].join('');
@@ -1450,7 +1497,7 @@
             //Function to convert rgb color to hex format
             function rgb2hex(rgb) {
                 rgb = rgb.match(/^rgb\((\d+),\s*(\d+),\s*(\d+)\)$/);
-                return "#" + hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
+                return hex(rgb[1]) + hex(rgb[2]) + hex(rgb[3]);
             }
 
             function hex(x) {

@@ -4,7 +4,7 @@
             "type": "mysql"
         },
         "Mysql": {
-            "host": "mysql",
+            "host": "database",
             "port": 3306,
             "user": "opencash",
             "password": "root",
@@ -16,16 +16,19 @@
             "port": 80,
             "host": "0.0.0.0"
         },
-        "Users": {
-            "username": {
-                "password": "password"
-            },
-            "user2": {
-                "password": "pass2"
+        "Auth": {
+            "Type" : "config",
+            "Users": {
+                "username": {
+                    "password": "password"
+                },
+                "user2": {
+                    "password": "pass2"
+                }
             }
         },
         "Mail": {
-            "enable": true,
+            "enable": false,
             "nodemailer" : {
                 "service": "gmail",
                 "auth": {

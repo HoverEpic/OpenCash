@@ -1,18 +1,5 @@
 version: '2'
 services:
-  opencash:
-      build: .
-      container_name: opencash_web
-      ports :
-       - 80:80
-      environment:
-       - MYSQL_HOST=database
-       - MYSQL_PORT=3306
-       - MYSQL_DATABASE=opencash
-       - MYSQL_USER=opencash
-       - MYSQL_PASSWORD=password
-      links:
-       - database
 
   database:
       image: mysql:8.0.15
@@ -24,4 +11,21 @@ services:
        - MYSQL_USER=opencash
        - MYSQL_PASSWORD=password
       volumes:
-       - ./data:/var/lib/mysql
+       - ./data:/bitnami/mariadb/data
+       - ./OpenCash-structure.sql:/docker-entrypoint-initdb.d/OpenCash-structure.sql
+
+  opencash:
+      build: .
+      container_name: opencash_web
+      ports :
+       - 80:80
+      environment:
+       - MYSQL_HOST=database
+       - MYSQL_PORT=3306
+       - MYSQL_DATABASE=opencash
+       - MYSQL_USER=opencash
+       - MYSQL_PASSWORD=password
+      volumes:
+       - ./config:/usr/src/app/config
+      links:
+       - database

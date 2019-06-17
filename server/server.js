@@ -12,6 +12,7 @@ const nodemailer = require('nodemailer');
 const fs = require('fs');
 const mime = require('mime');
 const dateFormat = require('dateformat');
+const sha1 = require('sha1');
 
 var app = express();
 
@@ -30,6 +31,8 @@ app.set('view engine', 'html');
 app.use(helmet());
 app.disable('x-powered-by');
 
+
+
 // Mailer
 var mailConfig = config.get('Config.Mail.nodemailer');
 var transporter = null;
@@ -46,7 +49,9 @@ var pool = mysql.createPool(dbConfig);
 // Constants TODO config env
 const PORT = config.get('Config.Server.port');
 const HOST = config.get('Config.Server.host');
-const AUTH = config.get('Config.Users');
+const AUTH = config.get('Config.Auth');
+const TYPE = Object(AUTH.Type);
+const USERS = Object(AUTH.Users);
 
 pool.getConnection(function (err, connection) {
     if (err)
@@ -127,24 +132,71 @@ app.get('/people', function (req, res) {
             res.status(403).send();
     });
 });
-app.post('/people', function (req, res) {
+app.get('/getpeople', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
-            var people = req.body.people;
-            for (let i = 0; i < people.length; i++) {
-                var person = people[i];
-                person.color = person.color.replace('#', '');
-                if (person.hasOwnProperty('id')) { //update
-                    update_people(person.id, person.name, person.color, function (result) {
-
-                    });
-                } else { //insert
-                    add_people(person.name, person.color, function (result) {
-
-                    });
+            var limit = req.query.limit || 10;
+            var offset = req.query.offset || 0;
+            var order = req.query.order || 'asc';
+            var sort = req.query.sort || 'id';
+            var search = req.query.search || '';
+            get_all_people(limit, offset, order.toUpperCase(), sort, search, function (results) {
+                var rows = [];
+                var total = 100;
+                if (results) {
+                    rows = results[0];
+                    total = results[1][0].total;
                 }
-                console.log(person);
+                res.send(JSON.stringify({rows: rows, total: total}));
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.put('/people', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            console.log(req.body);
+            var id = req.body.id;
+            var name = req.body.name;
+            var mail = req.body.mail;
+            var pass = req.body.pass;
+            var color = req.body.color;
+            pass = sha1(pass);
+
+            if (id !== 0) {
+                update_people(id, name, mail, pass, color, function (result) {
+                    console.log('update');
+                    if (result)
+                        res.send(JSON.stringify({result: result}));
+                    else {
+                        res.send(JSON.stringify({}));
+                    }
+                });
+            } else {
+                add_people(name, mail, pass, color, function (result) {
+                    if (result)
+                        res.send(JSON.stringify({result: result}));
+                    else {
+                        res.send(JSON.stringify({}));
+                    }
+                });
             }
+        } else
+            res.status(403).send();
+    });
+});
+app.post('/deletePeople', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var id = req.body.id;
+            remove_people(id, function (result) {
+                if (result)
+                    res.send(JSON.stringify({result: result}));
+                else {
+                    res.send(JSON.stringify({}));
+                }
+            });
         } else
             res.status(403).send();
     });
@@ -278,20 +330,15 @@ app.put('/ticket', function (req, res) {
 
                 get_itemscat_by_id(item.id, function (result) {
                     if (result) {
-//                        console.log(result);
                         if (result.type === 1) { //item
-//                            console.log("type = 1");
                             decrement_itemcat_stock(item.id, item.count, function (result1) {
                                 console.log("decrement " + item.name + " -" + item.count);
                             });
                         } else if (result.type === 2) { //lot
-//                            console.log("type = 2");
                             result.parts = JSON.parse(result.parts);
-//                            console.log("parts = " + result.parts.length);
                             for (let j = 0; j < result.parts.length; j++) {
                                 get_itemscat_by_id(result.parts[j].id, function (result2) {
                                     if (result2) {
-//                                        console.log(result2);
                                         if (result2.type === 1) { //item
                                             decrement_itemcat_stock(result2.id, result.parts[j].count * item.count, function (result3) {
                                                 console.log("decrement " + result2.name + " -" + result.parts[j].count * item.count);
@@ -301,7 +348,7 @@ app.put('/ticket', function (req, res) {
                                 });
                             }
                         } else {
-                            console.log("type = " + result.type);
+//                            console.log("type = " + result.type);
                         }
                     }
                 });
@@ -431,7 +478,10 @@ app.get('/backup', function (req, res) {
 // Security
 var check_auth = function (req, res, result) {
     var user = auth(req);
-    if (!user || !AUTH[user.name] || AUTH[user.name].password !== user.pass) {
+    if (TYPE === "mysql" && user && user.pass) { // password in database are sha1
+        user.pass = sha1(user.pass);
+    }
+    if (!user || !USERS[user.name] || USERS[user.name].password !== user.pass) {
         res.statusCode = 401;
         res.setHeader('WWW-Authenticate', 'Basic realm="example"');
         res.end('Access denied');
@@ -442,16 +492,22 @@ var check_auth = function (req, res, result) {
         return result(user);
     }
 };
-
-// Misc
-function getItemChildren(parent) {
-    get_itemscat_by_parent(parent, function (results) {
+var load_users = function (result) {
+    get_people(function (results) {
         if (results) {
-            return results;
+            if (results.length > 0) {
+                USERS = {};
+                let i;
+                for (i = 0; i < results.length; i++) {
+                    USERS[results[i].name] = {password: results[i].password};
+                }
+                return result(true);
+            }
         }
+        return result(false);
     });
-    return false;
-}
+};
+
 var getOrderedItems = function (result) {
     get_itemscat(function (results) {
         var stock = [];
@@ -490,7 +546,6 @@ var getOrderedItems = function (result) {
     });
 };
 
-
 // Mysql queries
 // people
 var get_people = function (result) {
@@ -502,8 +557,33 @@ var get_people = function (result) {
         return result(results);
     });
 };
-var add_people = function (name, color, result) {
-    pool.query('INSERT INTO People SET ?', {name: name, color: color}, function (error, results, fields) {
+var get_all_people = function (limit, offset, sort, order, search, result) {
+    pool.query([
+        [
+            'SELECT * FROM People',
+            'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
+        ].join(' '),
+        'SELECT COUNT(*) as total FROM People'].join(';'), function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};
+var get_people_by_name = function (name, result) {
+    pool.query('SELECT * FROM People WHERE `name` = ?', [name], function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        if (results.length === 1)
+            return result(results[0]);
+        return result(results);
+    });
+};
+var add_people = function (name, mail, password, color, result) {
+    pool.query('INSERT INTO People SET ?', {name: name, mail: mail, password: password, color: color}, function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -511,8 +591,8 @@ var add_people = function (name, color, result) {
         return result(true);
     });
 };
-var update_people = function (id, name, color, result) {
-    pool.query('UPDATE People SET `name` = ?, `color` = ? WHERE id = ?', [name, color, id], function (error, results, fields) {
+var update_people = function (id, name, mail, password, color, result) {
+    pool.query('UPDATE People SET `name` = ?, `mail` = ?, `password` = ?, `color` = ? WHERE id = ?', [name, mail, password, color, id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -730,6 +810,18 @@ if (mailConfig.enable) {
 //send_ticket(function (result) {
 //    console.log(JSON.stringify(result));
 //});
+
+if (TYPE === "mysql") {
+    load_users(function (result) {
+        if (result) {
+            console.log("Users loaded from Mysql !");
+        } else {
+            console.log("Fail to load users from Mysql, keeping users from config");
+            TYPE = "config";
+            console.log(USERS);
+        }
+    });
+}
 
 app.listen(PORT, HOST);
 console.log(`Running on http://${HOST}:${PORT}`);
