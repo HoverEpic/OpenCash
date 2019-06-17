@@ -11,7 +11,7 @@ services:
        - MYSQL_USER=opencash
        - MYSQL_PASSWORD=password
       volumes:
-       - ./data:/bitnami/mariadb/data
+       - ./data:/var/lib/mysql
        - ./OpenCash-structure.sql:/docker-entrypoint-initdb.d/OpenCash-structure.sql
 
   opencash:
