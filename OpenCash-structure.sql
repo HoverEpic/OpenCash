@@ -2,7 +2,8 @@
 SQLyog Ultimate v11.11 (64 bit)
 MySQL - 8.0.15 : Database - opencash
 *********************************************************************
-*/
+*/
+
 
 /*!40101 SET NAMES utf8 */;
 
@@ -22,7 +23,7 @@ CREATE TABLE `ItemsCat` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `parent` int(11) NOT NULL DEFAULT '-1',
   `order` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
+  `name` varchar(255) CHARACTER SET utf8mb4 NOT NULL,
   `type` tinyint(4) NOT NULL DEFAULT '0' COMMENT '0: category, 1: item',
   `people` int(11) NOT NULL DEFAULT '-1',
   `price` float NOT NULL DEFAULT '1',
@@ -35,8 +36,8 @@ CREATE TABLE `ItemsCat` (
 
 CREATE TABLE `People` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(30) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `color` varchar(6) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL DEFAULT '000000' COMMENT 'text color',
+  `name` varchar(30) CHARACTER SET utf8mb4 NOT NULL,
+  `color` varchar(6) CHARACTER SET utf8mb4 NOT NULL DEFAULT '000000' COMMENT 'text color',
   `color2` varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'FFFFFF' COMMENT 'background color',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
@@ -48,7 +49,7 @@ CREATE TABLE `Ticket` (
   `date` timestamp NOT NULL,
   `total` float NOT NULL DEFAULT '0',
   `type` mediumint(9) NOT NULL DEFAULT '0' COMMENT '0: especes, 1: cheque, 2: carte',
-  `mail` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `mail` varchar(100) CHARACTER SET utf8mb4 DEFAULT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
@@ -59,7 +60,7 @@ CREATE TABLE `Ticketlines` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `ticket` int(11) NOT NULL,
   `item` int(11) NOT NULL DEFAULT '0',
-  `name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL,
+  `name` varchar(100) CHARACTER SET utf8mb4 DEFAULT NULL,
   `count` int(11) NOT NULL DEFAULT '1',
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
