@@ -7,7 +7,7 @@
             "host": "database",
             "port": 3306,
             "user": "opencash",
-            "password": "root",
+            "password": "password",
             "database": "opencash",
             "connectionLimit": 10,
             "multipleStatements": true
