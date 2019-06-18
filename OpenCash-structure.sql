@@ -1,6 +1,6 @@
 /*
 SQLyog Ultimate v11.11 (64 bit)
-MySQL - 8.0.15 : Database - opencash
+MySQL - 5.5.62 : Database - opencash
 *********************************************************************
 */
 
@@ -30,7 +30,7 @@ CREATE TABLE `ItemsCat` (
   `count` int(11) NOT NULL DEFAULT '1',
   `parts` text COMMENT 'if the item have multiple parts ex :"{[{''part'': 2, ''count'': 5}]}"',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `People` */
 
@@ -38,7 +38,8 @@ CREATE TABLE `People` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(30) CHARACTER SET utf8mb4 NOT NULL,
   `color` varchar(6) CHARACTER SET utf8mb4 NOT NULL DEFAULT '000000' COMMENT 'text color',
-  `color2` varchar(6) CHARACTER SET utf8 COLLATE utf8_general_ci NOT NULL DEFAULT 'FFFFFF' COMMENT 'background color',
+  `password` varchar(50) DEFAULT NULL,
+  `mail` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
 
@@ -46,13 +47,13 @@ CREATE TABLE `People` (
 
 CREATE TABLE `Ticket` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `date` timestamp NOT NULL,
+  `date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `total` float NOT NULL DEFAULT '0',
   `type` mediumint(9) NOT NULL DEFAULT '0' COMMENT '0: especes, 1: cheque, 2: carte',
   `mail` varchar(100) CHARACTER SET utf8mb4 DEFAULT NULL,
   `deleted` tinyint(4) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `Ticketlines` */
 
@@ -64,7 +65,7 @@ CREATE TABLE `Ticketlines` (
   `count` int(11) NOT NULL DEFAULT '1',
   `price` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
 /*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
