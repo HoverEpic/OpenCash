@@ -717,8 +717,9 @@
                             if (data.error) {
                                 console.log(data.error);
                             } else {
+                                loadPacks();
                                 updateLevel(level, parent, true);
-                                $('#stockModal #profile  table').bootstrapTable('refresh');
+                                $('#stockModal #profile table').bootstrapTable('refresh');
                             }
                         }
                     });
@@ -832,7 +833,7 @@
                     pagination: true,
                     pageSize: 10,
                     pageList: [10, 25, 50, 100, 200],
-                    search: true,
+                    search: false,
                     searchAlign: 'right',
                     showColumns: false,
                     showRefresh: true,
