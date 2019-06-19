@@ -17,7 +17,8 @@ RUN apt-get update && apt-get install mysql-client -y
 
 COPY server ./server
 COPY public_html ./public_html
-COPY sample_config ./config
+COPY sample_config ./sample_config
+COPY start.sh ./start.sh
 
 EXPOSE 80
-CMD [ "npm", "start" ]
+CMD ["sh", "start.sh"]

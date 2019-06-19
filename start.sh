@@ -1,13 +1,8 @@
-#! /bin/ash
+#! /bin/bash
 
-if [ ! -d "config" ]; then
+if [ ! -d "config/" ]; then
     echo "Creating config dir"
     mkdir config
-fi
-
-if [ ! -d "/share" ]; then
-    echo "Creating share dir"
-    mkdir /config
 fi
 
 if [ ! -f "config/default.json" ]; then

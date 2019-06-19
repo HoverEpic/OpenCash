@@ -15,6 +15,7 @@ services:
       volumes:
        - ./data:/var/lib/mysql
        - ./OpenCash-structure.sql:/docker-entrypoint-initdb.d/OpenCash-structure.sql
+       - ./config:/usr/src/app/config
 
   opencash:
       build: .
