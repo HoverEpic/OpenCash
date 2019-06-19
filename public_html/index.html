@@ -1232,6 +1232,8 @@
                     $('#stockModal #level' + level).append('<li class="list-group-item ' + (activeLevel[level] === item.id ? ' active' : '') + '">' + item.name + ' <span title="Editer" class="glyphicon glyphicon-pencil edit_itemcat-' + item.id + '"></span> <span title="Stock" class="badge">' + item.count + '</span></li>');
                 else
                     $('#stockModal #level' + level).append('<li class="list-group-item ' + (activeLevel[level] === item.id ? ' active' : '') + '">' + item.name + ' <span title="Editer" class="glyphicon glyphicon-pencil edit_itemcat-' + item.id + '"></span> <span title="Lot" class="pull-right glyphicon glyphicon glyphicon-list"></span></li>');
+                //update modal height
+                $('#stockModal').modal('handleUpdate');
                 //listener
                 $('.edit_itemcat-' + item.id).on('click', function (e) {
                     editItemCat(item, level);
