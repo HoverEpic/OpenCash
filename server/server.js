@@ -156,7 +156,6 @@ app.get('/getpeople', function (req, res) {
 app.put('/people', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
-            console.log(req.body);
             var id = req.body.id;
             var name = req.body.name;
             var mail = req.body.mail;
@@ -166,7 +165,6 @@ app.put('/people', function (req, res) {
 
             if (id !== 0) {
                 update_people(id, name, mail, pass, color, function (result) {
-                    console.log('update');
                     if (result)
                         res.send(JSON.stringify({result: result}));
                     else {
@@ -319,7 +317,6 @@ app.post('/deleteStock', function (req, res) {
 app.put('/ticket', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
-//            console.log(req.body.items);
             var mode = req.body.mode;
             var items = req.body.items;
             var mail = req.body.mail;
