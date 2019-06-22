@@ -106,6 +106,9 @@ pool.getConnection(function (err, connection) {
 //  console.log('Connection %d released', connection.threadId);
 //});
 
+//used for assets
+app.use(express.static(path.join(require('path').resolve(__dirname, '..') + '/public_html')));
+
 //root
 app.get('/', function (req, res) {
     check_auth(req, res, function (result) {
@@ -467,6 +470,19 @@ app.get('/backup', function (req, res) {
                 var filestream = fs.createReadStream(download);
                 filestream.pipe(res);
             }
+        } else
+            res.status(403).send();
+    });
+});
+
+app.get('/stats', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var ticketId = req.query.id;
+            get_ticket(ticketId, function (results) {
+                if (results)
+                    res.send(JSON.stringify(results));
+            });
         } else
             res.status(403).send();
     });
