@@ -475,13 +475,50 @@ app.get('/backup', function (req, res) {
     });
 });
 
-app.get('/stats', function (req, res) {
+app.get('/daystats', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
-            var ticketId = req.query.id;
-            get_ticket(ticketId, function (results) {
-                if (results)
-                    res.send(JSON.stringify(results));
+            get_days_with_tickets(function (results) {
+                var data = [];
+                if (results) {
+                    for (let i = 0; i < results.length; i++) {
+                        var date = results[i].orderdate.split(" ");
+                        data[i] = new Date(date[2], date[0] - 1, date[1]);
+                    }
+                }
+                res.send(JSON.stringify(data));
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.post('/stats', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var from = req.body.from;
+            var to = req.body.to;
+            var people = req.body.people;
+            get_sales_money(from, to, people, function (results) {
+                var total = 0;
+                var people = [];
+                if (results) {
+                    for (let i = 0; i < results.length; i++) {
+                        var line = results[i];
+                        total += line.count * line.price;
+                        if (typeof people[line.people_id] === 'undefined') {
+                            people[line.people_id] = {};
+                            people[line.people_id]['total'] = 0;
+                            people[line.people_id]['items'] = [];
+                        }
+                        if (typeof people[line.people_id].items[line.item] === 'undefined') {
+                            people[line.people_id].items[line.item] = 0;
+                        }
+                        people[line.people_id].items[line.item] += line.count;
+                        people[line.people_id].total += (line.count * line.price);
+                    }
+                }
+                var data = {total: total, people: people};
+                res.send(JSON.stringify(data));
             });
         } else
             res.status(403).send();
@@ -786,6 +823,38 @@ var update_ticket_mail = function (id, mail, result) {
     });
 };
 
+//Stats
+var get_days_with_tickets = function (result) {
+    pool.query('SELECT DISTINCT DATE_FORMAT(`date`, \'%c %d %Y\') as orderdate FROM opencash.Ticket ORDER BY orderdate', function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};
+
+var get_sales_money = function (from, to, people, result) {
+//    console.log("FROM: " + from);
+//    console.log("TO: " + to);
+//    console.log("PEOPLE: " + people);
+    pool.query([
+        'SELECT opencash.Ticketlines.item, opencash.Ticketlines.`name`, opencash.Ticketlines.`count`, opencash.Ticketlines.price, opencash.Ticket.`date`,',
+        'opencash.People.id AS people_id',
+        'FROM opencash.Ticketlines',
+        'LEFT JOIN opencash.ItemsCat ON opencash.Ticketlines.item = opencash.ItemsCat.id',
+        'LEFT JOIN opencash.Ticket ON opencash.Ticketlines.ticket = opencash.Ticket.id',
+        'LEFT JOIN opencash.People ON opencash.ItemsCat.people = opencash.People.id',
+        'WHERE opencash.Ticket.`date` >= "' + from + '" AND opencash.Ticket.`date` <= "' + to + '"',
+        'AND opencash.Ticket.deleted = 0'
+    ].join(' '), function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};
 //Mailer function
 var send_ticket = function (ticketId, mail, result) {
     if (mailConfig.enable) {
@@ -810,7 +879,6 @@ var send_ticket = function (ticketId, mail, result) {
         return result("Mail are disabled in config");
     }
 };
-
 if (mailConfig.enable) {
     transporter.on('token', token => {
         console.log('A new access token was generated');

@@ -186,6 +186,7 @@
             <script src="/assets/js/moment-2.24.0-with-locales.min.js"></script>
             <script type="text/javascript" src="/assets/js/colorpicker.js"></script>
             <script type="text/javascript" src="/assets/js/bootstrap-datetimepicker.js"></script>
+            <script type="text/javascript" src="/assets/js/Chart.bundle.min.js"></script>
             <!-- Stock modal -->
             <div class="modal fade" tabindex="-1" role="dialog" id="stockModal">
                 <div class="modal-dialog modal-lg" role="document">
@@ -421,27 +422,60 @@
             </div>
             <!-- Stats -->
             <div class="modal fade" tabindex="-1" role="dialog" id="statsModal">
-                <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-dialog" role="document">
                     <div class="modal-content">
                         <div class="modal-header">
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
                             <h4 class="modal-title">Statistiques</h4>
                         </div>
                         <div class="modal-body">
-                            <div class="input-group ">
-                                <div class='input-group date' id='datetimepicker1'>
-                                    <input type='text' class="form-control" />
-                                    <span class="input-group-addon">
-                                        <span class="glyphicon glyphicon-calendar"></span>
-                                    </span>
+                            <div class="container">
+                                <div class='col-xs-3'>
+                                    <div class="form-group">
+                                        <div class='input-group date' id='datetimepicker_from'>
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
-                                <span class="input-group-btn">
-                                    <select class="form-control" id="people">
-                                        <option value="0" selected>Tout le monde</option>
-                                    </select>
-                                </span>
+                                <div class='col-xs-3'>
+                                    <div class="form-group">
+                                        <div class='input-group date' id='datetimepicker_to'>
+                                            <input type='text' class="form-control" />
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            
+                            <div class="container">
+                                <div class='col-xs-3'>
+                                    <div class="input-group ">
+                                        <select class="form-control" id="people" disabled>
+                                            <option value="0" selected>Tout le monde</option>
+                                        </select>
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-default" type="button">Go!</button>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class='col-xs-3'>
+                                    <div class="form-group">
+                                        <div class='input-group' id='total_sale'>
+                                            <input type='text' class="form-control" disabled/>
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-euro"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <canvas id="myChart" width="400" height="400" style="width: 300px; height: 300px;"></canvas>
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -1067,7 +1101,6 @@
                         contentType: 'application/json',
                         success: function (data) {
                             data = JSON.parse(data);
-                            console.log(data);
                             if (data.error) {
                                 console.log(data.error);
                             } else {
@@ -1078,18 +1111,102 @@
                         }
                     });
                 });
+
+                // Sauvegarde de la base de donnée
+                $('#backupDatabase').on('click', function (e) {
+                    backupDatabase();
+                });
+
+                //Stats
+                $('#statsModal').on('show.bs.modal', function (e) {
+                    $.ajax({
+                        url: '/daystats',
+                        type: 'GET',
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            //console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                var date = new Date();
+                                $('#datetimepicker_from').datetimepicker({
+                                    locale: 'fr',
+                                    format: 'DD/MM/YYYY',
+                                    defaultDate: date//,
+                                            //enabledDates: data
+                                });
+                                date.setDate(date.getDate() + 1);
+                                $('#datetimepicker_to').datetimepicker({
+                                    useCurrent: false, //Important! See issue #1075
+                                    locale: 'fr',
+                                    format: 'DD/MM/YYYY',
+                                    defaultDate: date//,
+                                            //enabledDates: data
+                                });
+                                $("#datetimepicker_from").on("dp.change", function (e) {
+                                    $('#datetimepicker_to').data("DateTimePicker").minDate(e.date);
+                                });
+                                $("#datetimepicker_to").on("dp.change", function (e) {
+                                    $('#datetimepicker_from').data("DateTimePicker").maxDate(e.date);
+                                });
+                            }
+                        }
+                    });
+                });
+                $('#statsModal').on('show.bs.modal', function (e) {
+                    $('#statsModal #total_sale input').val(-1);
+                });
+                $('#statsModal button').on('click', function (e) {
+                    var ctx = $('#myChart');
+                    var from = $('#datetimepicker_from').data('DateTimePicker').date().format("YYYY-MM-DD 00:00:000");
+                    var to = $('#datetimepicker_to').data('DateTimePicker').date().format("YYYY-MM-DD 00:00:000");
+                    var people_input = $('#statsModal #people').val();
+                    $.ajax({
+                        url: '/stats',
+                        type: 'POST',
+                        data: JSON.stringify({from: from, to: to, people: people_input}),
+                        contentType: 'application/json',
+                        success: function (data) {
+                            data = JSON.parse(data);
+                            console.log(data);
+                            if (data.error) {
+                                console.log(data.error);
+                            } else {
+                                $('#statsModal #total_sale input').val(data.total);
+                                var index = 0;
+                                var graph_labels = [];
+                                var graph_colors = [];
+                                var graph_data = [];
+
+                                for (let i = 0; i < data.people.length; i++) {
+                                    if (data.people[i] !== null) {
+                                        graph_labels[index] = people[i].name;
+                                        graph_colors[index] = "#" + people[i].color;
+                                        graph_data[index] = data.people[i].total;
+                                        index++;
+                                    }
+                                }
+                                new Chart(ctx, {
+                                    "type": "pie",
+                                    "data": {
+                                        "labels": graph_labels,
+                                        "datasets": [
+                                            {
+                                                "label": "My First Dataset",
+                                                "data": graph_data,
+                                                "backgroundColor": graph_colors
+                                            }
+                                        ]
+                                    }
+                                });
+                            }
+                        }
+                    });
+                });
+
             });
-            // Sauvegarde de la base de donnée
-            $('#backupDatabase').on('click', function (e) {
-                backupDatabase();
-            });
-            var timeInit = false;
-            $('statsModal').on('show.bs.modal', function (event){
-                if (!timeInit) {
-                    $('#datetimepicker1').datetimepicker();
-                    timeInit = true;
-                }
-            });
+
             window.operateEvents = {// catch table events here !
                 'click .view': function (e, value, row, index) {
                     viewTicket(row);
@@ -1234,6 +1351,7 @@
                             for (let i = 0; i < data.result.length; i++) {
                                 people[data.result[i].id] = data.result[i];
                                 $("#itemsModal #people").append('<option value = "' + data.result[i].id + '" style="color: #' + data.result[i].color + ';">' + data.result[i].name + '</option>');
+                                $("#statsModal #people").append('<option value = "' + data.result[i].id + '" style="color: #' + data.result[i].color + ';">' + data.result[i].name + '</option>');
                             }
                         }
                     }
