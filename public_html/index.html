@@ -454,7 +454,7 @@
                             <div class="container">
                                 <div class='col-xs-3'>
                                     <div class="input-group ">
-                                        <select class="form-control" id="people" disabled>
+                                        <select class="form-control" id="people">
                                             <option value="0" selected>Tout le monde</option>
                                         </select>
                                         <span class="input-group-btn">
@@ -1155,13 +1155,19 @@
                     });
                 });
                 $('#statsModal').on('show.bs.modal', function (e) {
-                    $('#statsModal #total_sale input').val(-1);
+                    $('#statsModal #total_sale input').val("");
                 });
+                var sales_chart = null;
                 $('#statsModal button').on('click', function (e) {
                     var ctx = $('#myChart');
                     var from = $('#datetimepicker_from').data('DateTimePicker').date().format("YYYY-MM-DD 00:00:000");
                     var to = $('#datetimepicker_to').data('DateTimePicker').date().format("YYYY-MM-DD 00:00:000");
                     var people_input = $('#statsModal #people').val();
+                    // clean chart
+                    if (sales_chart !== null)
+                        sales_chart.destroy();
+                    ctx.empty();
+
                     $.ajax({
                         url: '/stats',
                         type: 'POST',
@@ -1169,43 +1175,92 @@
                         contentType: 'application/json',
                         success: function (data) {
                             data = JSON.parse(data);
-                            console.log(data);
+                            //console.log(data);
                             if (data.error) {
                                 console.log(data.error);
                             } else {
-                                $('#statsModal #total_sale input').val(data.total);
+                                if (data.total === 0) {
+                                    var canvas = ctx.get(0);
+                                    var context = canvas.getContext("2d");
+                                    context.textAlign = "center";
+                                    context.font = "30px Arial";
+                                    context.fillText("Pas de données", canvas.width / 2, canvas.height / 2);
+                                    return;
+                                }
                                 var index = 0;
                                 var graph_labels = [];
                                 var graph_colors = [];
                                 var graph_data = [];
-
-                                for (let i = 0; i < data.people.length; i++) {
-                                    if (data.people[i] !== null) {
-                                        graph_labels[index] = people[i].name;
-                                        graph_colors[index] = "#" + people[i].color;
-                                        graph_data[index] = data.people[i].total;
-                                        index++;
+                                if (people_input === '0') {
+                                    $('#statsModal #total_sale input').val(data.total);
+                                    for (let i = 0; i < data.people.length; i++) {
+                                        if (data.people[i] !== null) {
+                                            graph_labels[index] = people[i].name;
+                                            graph_colors[index] = "#" + people[i].color;
+                                            graph_data[index] = data.people[i].total;
+                                            index++;
+                                        }
+                                    }
+                                    sales_chart = new Chart(ctx, {
+                                        "type": "pie",
+                                        "data": {
+                                            "labels": graph_labels,
+                                            "datasets": [
+                                                {
+                                                    "label": " Dataset",
+                                                    "data": graph_data,
+                                                    "backgroundColor": graph_colors
+                                                }
+                                            ]
+                                        }
+                                    });
+                                } else {
+                                    var sales = data.people[people_input];
+                                    if (sales !== null) {
+                                        $('#statsModal #total_sale input').val(sales.total);
+                                        //console.log(stock);
+                                        for (let i = 0; i < sales.items.length; i++) {
+                                            if (sales.items[i] !== null) {
+                                                if (stock[i] !== null) {
+                                                    graph_labels[index] = stock[i].name;
+                                                    graph_colors[index] = getRandomColor();
+                                                    graph_data[index] = sales.items[i];
+                                                    index++;
+                                                } else {
+                                                    //console.log(sales.items[i] + " not in stock");
+                                                }
+                                            }
+                                        }
+                                        sales_chart = new Chart(ctx, {
+                                            "type": "pie",
+                                            "data": {
+                                                "labels": graph_labels,
+                                                "datasets": [
+                                                    {
+                                                        "label": "My First Dataset",
+                                                        "data": graph_data,
+                                                        "backgroundColor": graph_colors
+                                                    }
+                                                ]
+                                            }
+                                        });
                                     }
                                 }
-                                new Chart(ctx, {
-                                    "type": "pie",
-                                    "data": {
-                                        "labels": graph_labels,
-                                        "datasets": [
-                                            {
-                                                "label": "My First Dataset",
-                                                "data": graph_data,
-                                                "backgroundColor": graph_colors
-                                            }
-                                        ]
-                                    }
-                                });
                             }
                         }
                     });
                 });
 
             });
+
+            function getRandomColor() {
+                var letters = '0123456789ABCDEF'.split('');
+                var color = '#';
+                for (var i = 0; i < 6; i++) {
+                    color += letters[Math.floor(Math.random() * 16)];
+                }
+                return color;
+            }
 
             window.operateEvents = {// catch table events here !
                 'click .view': function (e, value, row, index) {
