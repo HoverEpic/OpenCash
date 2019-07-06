@@ -497,8 +497,7 @@ app.post('/stats', function (req, res) {
         if (result) {
             var from = req.body.from;
             var to = req.body.to;
-            var people = req.body.people;
-            get_sales_money(from, to, people, function (results) {
+            get_sales_money(from, to, function (results) {
                 var total = 0;
                 var people = [];
                 if (results) {
@@ -519,6 +518,18 @@ app.post('/stats', function (req, res) {
                 }
                 var data = {total: total, people: people};
                 res.send(JSON.stringify(data));
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.post('/stats_days', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var from = req.body.from;
+            var to = req.body.to;
+            get_sales_dates(from, to, function (results) {
+                res.send(JSON.stringify(results));
             });
         } else
             res.status(403).send();
@@ -834,7 +845,7 @@ var get_days_with_tickets = function (result) {
     });
 };
 
-var get_sales_money = function (from, to, people, result) {
+var get_sales_money = function (from, to, result) {
 //    console.log("FROM: " + from);
 //    console.log("TO: " + to);
 //    console.log("PEOPLE: " + people);
@@ -847,6 +858,25 @@ var get_sales_money = function (from, to, people, result) {
         'LEFT JOIN opencash.People ON opencash.ItemsCat.people = opencash.People.id',
         'WHERE opencash.Ticket.`date` >= "' + from + '" AND opencash.Ticket.`date` <= "' + to + '"',
         'AND opencash.Ticket.deleted = 0'
+    ].join(' '), function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(results);
+    });
+};
+
+var get_sales_dates = function (from, to, result) {
+//    console.log("FROM: " + from);
+//    console.log("TO: " + to);
+//    console.log("PEOPLE: " + people);
+    pool.query([
+        'SELECT DATE(`date`) as `time`, SUM(`total`) totalCount',
+        'FROM opencash.Ticket',
+        'WHERE opencash.Ticket.`date` >= "' + from + '" AND opencash.Ticket.`date` <= "' + to + '"',
+        'AND opencash.Ticket.deleted = 0',
+        'GROUP BY DATE(`time`)'
     ].join(' '), function (error, results, fields) {
         if (error) {
             console.log(error);

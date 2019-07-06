@@ -453,18 +453,34 @@
                             </div>
                             <div class="container">
                                 <div class='col-xs-3'>
-                                    <div class="input-group ">
-                                        <select class="form-control" id="people">
-                                            <option value="0" selected>Tout le monde</option>
+
+                                    <div class="form-group">
+                                        <select class="form-control" id="stat_type">
+                                            <option value="0" selected>Money</option>
+                                            <option value="1">Dates</option>
                                         </select>
-                                        <span class="input-group-btn">
-                                            <button class="btn btn-default" type="button">Go!</button>
-                                        </span>
                                     </div>
                                 </div>
                                 <div class='col-xs-3'>
                                     <div class="form-group">
+                                        <div class="input-group ">
+                                            <select class="form-control" id="people">
+                                                <option value="0" selected>Tout le monde</option>
+                                            </select>
+                                            <span class="input-group-btn">
+                                                <button class="btn btn-default" type="button">Go!</button>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="container">
+                                <div class='col-xs-6'>
+                                    <div class="form-group">
                                         <div class='input-group' id='total_sale'>
+                                            <span class="input-group-addon">
+                                                Total
+                                            </span>
                                             <input type='text' class="form-control" disabled/>
                                             <span class="input-group-addon">
                                                 <span class="glyphicon glyphicon-euro"></span>
@@ -496,6 +512,7 @@
             var peopleDeleted = [];
             var stock = [];
             var activeLevel = [];
+            moment.locale('fr');
 
             $(document).ready(function () {
                 console.log("ready!");
@@ -1163,72 +1180,44 @@
                     var from = $('#datetimepicker_from').data('DateTimePicker').date().format("YYYY-MM-DD 00:00:000");
                     var to = $('#datetimepicker_to').data('DateTimePicker').date().format("YYYY-MM-DD 00:00:000");
                     var people_input = $('#statsModal #people').val();
+                    var stat_type = $('#statsModal #stat_type').val();
                     // clean chart
                     if (sales_chart !== null)
                         sales_chart.destroy();
                     ctx.empty();
 
-                    $.ajax({
-                        url: '/stats',
-                        type: 'POST',
-                        data: JSON.stringify({from: from, to: to, people: people_input}),
-                        contentType: 'application/json',
-                        success: function (data) {
-                            data = JSON.parse(data);
-                            //console.log(data);
-                            if (data.error) {
-                                console.log(data.error);
-                            } else {
-                                if (data.total === 0) {
-                                    var canvas = ctx.get(0);
-                                    var context = canvas.getContext("2d");
-                                    context.textAlign = "center";
-                                    context.font = "30px Arial";
-                                    context.fillText("Pas de données", canvas.width / 2, canvas.height / 2);
-                                    return;
-                                }
-                                var index = 0;
-                                var graph_labels = [];
-                                var graph_colors = [];
-                                var graph_data = [];
-                                if (people_input === '0') {
-                                    $('#statsModal #total_sale input').val(data.total);
-                                    for (let i = 0; i < data.people.length; i++) {
-                                        if (data.people[i] !== null) {
-                                            graph_labels[index] = people[i].name;
-                                            graph_colors[index] = "#" + people[i].color;
-                                            graph_data[index] = data.people[i].total;
-                                            index++;
-                                        }
-                                    }
-                                    sales_chart = new Chart(ctx, {
-                                        "type": "pie",
-                                        "data": {
-                                            "labels": graph_labels,
-                                            "datasets": [
-                                                {
-                                                    "label": " Dataset",
-                                                    "data": graph_data,
-                                                    "backgroundColor": graph_colors
-                                                }
-                                            ]
-                                        }
-                                    });
+                    if (stat_type === '0') { // sales by money
+                        $.ajax({
+                            url: '/stats',
+                            type: 'POST',
+                            data: JSON.stringify({from: from, to: to}),
+                            contentType: 'application/json',
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                //console.log(data);
+                                if (data.error) {
+                                    console.log(data.error);
                                 } else {
-                                    var sales = data.people[people_input];
-                                    if (sales !== null) {
-                                        $('#statsModal #total_sale input').val(sales.total);
-                                        //console.log(stock);
-                                        for (let i = 0; i < sales.items.length; i++) {
-                                            if (sales.items[i] !== null) {
-                                                if (stock[i] !== null) {
-                                                    graph_labels[index] = stock[i].name;
-                                                    graph_colors[index] = getRandomColor();
-                                                    graph_data[index] = sales.items[i];
-                                                    index++;
-                                                } else {
-                                                    //console.log(sales.items[i] + " not in stock");
-                                                }
+                                    if (data.total === 0) {
+                                        var canvas = ctx.get(0);
+                                        var context = canvas.getContext("2d");
+                                        context.textAlign = "center";
+                                        context.font = "30px Arial";
+                                        context.fillText("Pas de données", canvas.width / 2, canvas.height / 2);
+                                        return;
+                                    }
+                                    var index = 0;
+                                    var graph_labels = [];
+                                    var graph_colors = [];
+                                    var graph_data = [];
+                                    if (people_input === '0') {
+                                        $('#statsModal #total_sale input').val(data.total);
+                                        for (let i = 0; i < data.people.length; i++) {
+                                            if (data.people[i] !== null) {
+                                                graph_labels[index] = people[i].name;
+                                                graph_colors[index] = "#" + people[i].color;
+                                                graph_data[index] = data.people[i].total;
+                                                index++;
                                             }
                                         }
                                         sales_chart = new Chart(ctx, {
@@ -1237,18 +1226,101 @@
                                                 "labels": graph_labels,
                                                 "datasets": [
                                                     {
-                                                        "label": "My First Dataset",
+                                                        "label": " Dataset",
                                                         "data": graph_data,
                                                         "backgroundColor": graph_colors
                                                     }
                                                 ]
                                             }
                                         });
+                                    } else {
+                                        var sales = data.people[people_input];
+                                        if (sales !== null) {
+                                            $('#statsModal #total_sale input').val(sales.total);
+                                            //console.log(stock);
+                                            for (let i = 0; i < sales.items.length; i++) {
+                                                if (sales.items[i] !== null) {
+                                                    if (stock[i] !== null) {
+                                                        graph_labels[index] = stock[i].name;
+                                                        graph_colors[index] = getRandomColor();
+                                                        graph_data[index] = sales.items[i];
+                                                        index++;
+                                                    } else {
+                                                        //console.log(sales.items[i] + " not in stock");
+                                                    }
+                                                }
+                                            }
+                                            sales_chart = new Chart(ctx, {
+                                                "type": "pie",
+                                                "data": {
+                                                    "labels": graph_labels,
+                                                    "datasets": [
+                                                        {
+                                                            "label": "My First Dataset",
+                                                            "data": graph_data,
+                                                            "backgroundColor": graph_colors
+                                                        }
+                                                    ]
+                                                }
+                                            });
+                                        }
                                     }
                                 }
                             }
-                        }
-                    });
+                        });
+                    } else { // sales by days
+                        $.ajax({
+                            url: '/stats_days',
+                            type: 'POST',
+                            data: JSON.stringify({from: from, to: to}),
+                            contentType: 'application/json',
+                            success: function (data) {
+                                data = JSON.parse(data);
+                                console.log(data);
+                                if (data.error) {
+                                    console.log(data.error);
+                                } else {
+                                    var total = 0;
+                                    var graph_data = [];
+                                    for (var i = 0; i < data.length; i++) {
+                                        graph_data.push({x: data[i].time, y: data[i].totalCount});
+                                        total += data[i].totalCount;
+                                    }
+                                    $('#statsModal #total_sale input').val(total);
+                                    sales_chart = new Chart(ctx, {
+                                        "type": "line",
+                                        "data": {
+                                            "datasets": [
+                                                {
+                                                    data: graph_data
+                                                }
+                                            ]
+                                        },
+                                        options: {
+                                            scales: {
+                                                xAxes: [{
+                                                        type: 'time',
+                                                        distribution: 'linear',
+                                                        time: {
+                                                            unit: 'day',
+                                                            displayFormats: {
+                                                                day: 'dddd D MMM',
+                                                                displayFormats: 'dddd D MMM'
+                                                            }
+                                                        },
+                                                        ticks: {
+                                                            min: 0,
+                                                            stepSize: 1
+                                                        },
+                                                        parser : {}
+                                                    }]
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        });
+                    }
                 });
 
             });
