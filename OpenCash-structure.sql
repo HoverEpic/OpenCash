@@ -28,6 +28,7 @@ CREATE TABLE `ItemsCat` (
   `people` int(11) NOT NULL DEFAULT '-1',
   `price` float NOT NULL DEFAULT '1',
   `count` int(11) NOT NULL DEFAULT '1',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0',
   `parts` text COMMENT 'if the item have multiple parts ex :"{[{''part'': 2, ''count'': 5}]}"',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
@@ -41,7 +42,7 @@ CREATE TABLE `People` (
   `password` varchar(50) DEFAULT NULL,
   `mail` varchar(50) DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 /*Table structure for table `Ticket` */
 

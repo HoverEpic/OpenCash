@@ -302,11 +302,26 @@ app.put('/addstock', function (req, res) {
             res.status(403).send();
     });
 });
-app.post('/deleteStock', function (req, res) {
+app.post('/hideStock', function (req, res) {
     check_auth(req, res, function (result) {
         if (result) {
             var id = req.body.id;
-            remove_itemcat(id, function (result) {
+            hide_itemcat(id, function (result) {
+                if (result)
+                    res.send(JSON.stringify({result: result}));
+                else {
+                    res.send(JSON.stringify({}));
+                }
+            });
+        } else
+            res.status(403).send();
+    });
+});
+app.post('/showStock', function (req, res) {
+    check_auth(req, res, function (result) {
+        if (result) {
+            var id = req.body.id;
+            show_itemcat(id, function (result) {
                 if (result)
                     res.send(JSON.stringify({result: result}));
                 else {
@@ -703,10 +718,10 @@ var get_itemscat_by_parent = function (parentId, result) {
 var get_all_items = function (limit, offset, sort, order, search, result) {
     pool.query([
         [
-            'SELECT * FROM ItemsCat WHERE `type` = 1',
+            'SELECT * FROM ItemsCat',
             'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
         ].join(' '),
-        'SELECT COUNT(*) as total FROM ItemsCat WHERE `type` = 1'].join(';'), function (error, results, fields) {
+        'SELECT COUNT(*) as total FROM ItemsCat'].join(';'), function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -715,7 +730,7 @@ var get_all_items = function (limit, offset, sort, order, search, result) {
     });
 };
 var get_items = function (result) {
-    pool.query('SELECT * FROM ItemsCat WHERE `type` = ? ORDER BY `id` ASC', [1], function (error, results, fields) {
+    pool.query('SELECT * FROM ItemsCat ORDER BY `id` ASC', [1], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -752,8 +767,17 @@ var decrement_itemcat_stock = function (id, decrement, result) {
         return result(true);
     });
 };
-var remove_itemcat = function (id, result) {
-    pool.query('DELETE FROM ItemsCat WHERE `id` = ?', [id], function (error, results, fields) {
+var hide_itemcat = function (id, result) {
+    pool.query('UPDATE ItemsCat SET `deleted` = 1 WHERE `id` = ?', [id], function (error, results, fields) {
+        if (error) {
+            console.log(error);
+            return result(false);
+        }
+        return result(true);
+    });
+};
+var show_itemcat = function (id, result) {
+    pool.query('UPDATE ItemsCat SET `deleted` = 0 WHERE `id` = ?', [id], function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -776,6 +800,7 @@ var add_ticket = function (payementMode, items, total, mail, result) {
                     console.log(error);
                     return result(false);
                 }
+                //TODO decrement stock OR increment in case of return product
             });
         }
         return result(ticketId);
