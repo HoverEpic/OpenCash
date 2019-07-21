@@ -46,7 +46,7 @@ if (mailConfig.enable) {
 var dbConfig = config.get('Config.Mysql');
 var pool = mysql.createPool(dbConfig);
 
-// Constants TODO config env
+// Config
 const PORT = config.get('Config.Server.port');
 const HOST = config.get('Config.Server.host');
 const AUTH = config.get('Config.Auth');
@@ -347,7 +347,7 @@ app.put('/ticket', function (req, res) {
                     if (result) {
                         if (result.type === 1) { //item
                             decrement_itemcat_stock(item.id, item.count, function (result1) {
-                                console.log("decrement " + item.name + " -" + item.count);
+//                                console.log("decrement " + item.name + "(" + item.id + ") -" + item.count);
                             });
                         } else if (result.type === 2) { //lot
                             result.parts = JSON.parse(result.parts);
@@ -356,7 +356,7 @@ app.put('/ticket', function (req, res) {
                                     if (result2) {
                                         if (result2.type === 1) { //item
                                             decrement_itemcat_stock(result2.id, result.parts[j].count * item.count, function (result3) {
-                                                console.log("decrement " + result2.name + " -" + result.parts[j].count * item.count);
+//                                                console.log("decrement " + result2.name + "(" + item.id + ") -" + result.parts[j].count * item.count);
                                             });
                                         }
                                     }
@@ -422,7 +422,7 @@ app.delete('/delltickets', function (req, res) {
             if (ids.length === 0)
                 res.status(200).send();
             else
-                remove_tickets("(" + ids.join(", ") + ")", function (result) {
+                remove_tickets(ids, function (result) {
                     if (result)
                         res.status(200).send();
                 });
@@ -800,7 +800,6 @@ var add_ticket = function (payementMode, items, total, mail, result) {
                     console.log(error);
                     return result(false);
                 }
-                //TODO decrement stock OR increment in case of return product
             });
         }
         return result(ticketId);
@@ -812,7 +811,7 @@ var get_ticket = function (ticketId, result) {
             console.log(error);
             return result(false);
         }
-        var data = {id: results[0].id, date: results[0].date, mode: results[0].type, total: results[0].total, mail: results[0].mail};
+        var data = {id: results[0].id, date: results[0].date, mode: results[0].type, deleted: results[0].deleted, total: results[0].total, mail: results[0].mail};
         pool.query('SELECT * FROM Ticketlines WHERE `ticket` = ? ORDER BY `id`', [ticketId], function (error, results) {
             if (error) {
                 console.log(error);
@@ -821,16 +820,15 @@ var get_ticket = function (ticketId, result) {
             data.items = results;
             return result(data);
         });
-        return result(false);
     });
 };
 var get_all_tickets = function (limit, offset, sort, order, search, result) {
     pool.query([
         [
-            'SELECT * FROM Ticket WHERE `deleted` = 0',
+            'SELECT * FROM Ticket',
             'ORDER BY ' + order + ' ' + sort + ' LIMIT ' + offset + ', ' + limit
         ].join(' '),
-        'SELECT COUNT(*) as total FROM Ticket WHERE `deleted` = 0'].join(';'), function (error, results, fields) {
+        'SELECT COUNT(*) as total FROM Ticket'].join(';'), function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
@@ -839,12 +837,54 @@ var get_all_tickets = function (limit, offset, sort, order, search, result) {
     });
 };
 var remove_tickets = function (ids, result) {
-    pool.query('UPDATE Ticket SET `deleted` = 1 WHERE `id` IN ' + ids, function (error, results, fields) {
+    pool.query('UPDATE Ticket SET `deleted` = 1 WHERE `id` IN (' + ids.join(', ') + ')', function (error, results, fields) {
         if (error) {
             console.log(error);
             return result(false);
         }
-        return result(true);
+        // create the removed ticket for reverse transaction
+        for (let id = 0; id < ids.length; id++) {
+            get_ticket(ids[id], function (oldTicket) {
+                // create the new ticket
+                var newTicket = {mode: oldTicket.mode, items: [oldTicket.items.length], total: 0 - oldTicket.total, mail: oldTicket.mail};
+
+                for (let i = 0; i < oldTicket.items.length; i++) {
+
+                    let item = oldTicket.items[i];
+                    // invert items count
+                    item.count = 0 - item.count;
+                    item.id = item.item;
+                    newTicket.items[i] = item;
+                    // stock work
+                    get_itemscat_by_id(item.item, function (result) {
+                        if (result) {
+                            if (result.type === 1) { //item
+                                decrement_itemcat_stock(item.item, item.count, function (result1) {
+//                                    console.log("decrement " + item.name + "(" + item.item + ") -" + item.count);
+                                });
+                            } else if (result.type === 2) { //lot
+                                result.parts = JSON.parse(result.parts);
+                                for (let j = 0; j < result.parts.length; j++) {
+                                    get_itemscat_by_id(result.parts[j].id, function (result2) {
+                                        if (result2) {
+                                            if (result2.type === 1) { //item
+                                                decrement_itemcat_stock(result2.id, result.parts[j].count * item.count, function (result3) {
+//                                                    console.log("decrement " + result2.name + "(" + item.id + ") -" + result.parts[j].count * item.count);
+                                                });
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        }
+                    });
+                }
+                // insert the new ticket
+                add_ticket(newTicket.mode, newTicket.items, newTicket.total, newTicket.mail, function (ticketId) {
+                    return result(ticketId);
+                });
+            });
+        }
     });
 };
 var update_ticket_mail = function (id, mail, result) {

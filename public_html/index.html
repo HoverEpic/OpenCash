@@ -115,10 +115,10 @@
                                             <button class="btn btn-default" type="submit" value="C">c</button>
                                         </div>
                                         <div class="col-md-6">
-                                            <button class="btn btn-default btn-primary" id="add_to_ticket" style="margin-bottom: 10px;">Ajouter au ticket</button>
+                                            <button class="btn btn-default btn-primary" id="add_to_ticket" style="margin-bottom: 10px;">Ajouter</button>
                                             <button class="btn btn-default btn-warning" id="reset" style="margin-bottom: 10px;">RAZ</button>
+                                            <button class="btn btn-default btn-danger" id="return" style="margin-bottom: 10px;">Reprise</button>
                                         </div>
-                                        <!-- //TODO return article button -->
                                     </div>
                                 </li>
                             </ul>
@@ -601,8 +601,8 @@
                     itemTicketCount += count;
                     var tprice = price * count;
                     totalTicketPrice += tprice;
-                    var countDisplay = count > 1 ? ' x' + count : "";
-                    var line = '<li class="list-group-item ticket_item" id="ticketItem-' + ticketItem + '" item_price="' + price + '" total_price="' + tprice + '" item_count="' + count + '" item_id="' + id + '" item_name="' + name + '">' + name + countDisplay + ' (' + tprice + '€) <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>';
+                    var countDisplay = count !== 1 ? ' x ' + count : "";
+                    var line = '<li class="list-group-item ' + (count < 0 ? 'list-group-item-warning ' : '') + 'ticket_item" id="ticketItem-' + ticketItem + '" item_price="' + price + '" total_price="' + tprice + '" item_count="' + count + '" item_id="' + id + '" item_name="' + name + '">' + name + countDisplay + ' (' + tprice + '€) ' + (count < 0 ? '(Reprise)' : '') + ' <span title="Supprimer" class="glyphicon glyphicon-trash pull-right"></span></li>';
                     //remove total line
                     $('#ticket #total').remove();
                     // add item line
@@ -617,7 +617,7 @@
                         $('#ticket .badge').html(itemTicketCount);
                         totalTicketPrice -= removePrice;
                         $('#ticket #total').remove();
-                        $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                        $('#ticket ul').append('<li class="list-group-item ' + (totalTicketPrice < 0 ? 'list-group-item-danger ' : '') + 'unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
                         $(this).parent('li').remove();
                         $('#ticket #ticketItem-' + ticketItem + ' .glyphicon').off();
                         e.stopPropagation();
@@ -627,7 +627,7 @@
                     //update count and total
                     $('#ticket .badge').html(itemTicketCount);
                     //update total
-                    $('#ticket ul').append('<li class="list-group-item unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
+                    $('#ticket ul').append('<li class="list-group-item ' + (totalTicketPrice < 0 ? 'list-group-item-danger ' : '') + 'unsortable" id="total">Total : ' + totalTicketPrice + ' €</li>');
                     // reset vente
                     resetVente();
                     e.stopPropagation();
@@ -636,6 +636,14 @@
 
                 $('#reset').on("click", function (e) {
                     resetVente();
+                });
+
+                $('#return').on("click", function (e) {
+                    var count = $('#item-prepare #item_count').val();
+                    if (count === "")
+                        count = 1;
+                    count = 0 - count;
+                    $('#item-prepare #item_count').val(count);
                 });
 
                 $('#payement_methods .glyphicon').hide();
@@ -709,6 +717,7 @@
                                 $('#payement_methods label').attr('disabled', true);
                                 $('#payement_methods #new_ticket').show();
                                 $('#mailTicket input').attr('disabled', true);
+                                $('#stockModal #profile table').bootstrapTable('refresh');
                                 e.stopPropagation();
                                 e.preventDefault();
                             }
@@ -1730,11 +1739,11 @@
             function ticketOptions(value, row, index) {
                 return [
                     '<button class="btn btn-default btn-xs view" title="Voir">',
-                    '<i class="glyphicon glyphicon-list"></i> Voir',
+                    '<i class="glyphicon glyphicon-list"></i> Détails',
                     '</button> ',
-                    '<button class="btn btn-danger btn-xs remove" title="Delete">',
-                    '<i class="glyphicon glyphicon-remove"></i> Remove',
-                    '</button> '
+                    !row.deleted ? '<button class="btn btn-danger btn-xs remove" title="Delete">' : '',
+                    !row.deleted ? '<i class="glyphicon glyphicon-remove"></i> Annuler' : '',
+                    !row.deleted ? '</button>' : ''
                 ].join('');
             }
             function typeFormat(value, row, index) {
@@ -1813,7 +1822,10 @@
                         if (data.error) {
                             console.log(data.error);
                         } else {
-                            $('#ticketModal .modal-title span').html(data.id);
+                            var title = data.id;
+                            if (data.deleted)
+                                title += ' (Annulé)';
+                            $('#ticketModal .modal-title span').html(title);
                             var time = moment(data.date);
                             if (time.isValid())
                                 time = time.format('DD/MM/YYYY HH:mm');
@@ -1829,10 +1841,10 @@
                             $('#ticketModal .ticket_item').remove();
                             $('#ticketModal .total').remove();
                             for (let i = 0; i < data.items.length; i++) {
-                                var countDisplay = data.items[i].count > 1 ? ' x' + data.items[i].count : "";
-                                $('#ticketModal ul').append('<li class="list-group-item ticket_item">' + data.items[i].name + " " + countDisplay + ' (' + data.items[i].price + '€)</li>');
+                                var countDisplay = data.items[i].count !== 1 ? ' x ' + data.items[i].count : "";
+                                $('#ticketModal ul').append('<li class="list-group-item ' + (data.items[i].count < 0 ? 'list-group-item-warning ' : '') + 'ticket_item">' + data.items[i].name + " " + countDisplay + ' (' + data.items[i].price + '€) ' + (data.items[i].count < 0 ? '(Reprise)' : '') + '</li>');
                             }
-                            $('#ticketModal ul').append('<li class="list-group-item total">Total : ' + data.total + ' €</li>');
+                            $('#ticketModal ul').append('<li class="list-group-item ' + (data.total < 0 ? 'list-group-item-danger ' : '') + 'total">Total : ' + data.total + ' €</li>');
                             $('#ticketModal').modal('show');
                         }
                     }
@@ -1850,11 +1862,8 @@
                         if (data.error) {
                             console.log(data.error);
                         } else {
-                            $('#ticketsModal table').bootstrapTable('remove', {
-                                field: 'id',
-                                values: ids
-                            });
                             $('#ticketsModal table').bootstrapTable('refresh');
+                            $('#stockModal #profile table').bootstrapTable('refresh');
                         }
                     }
                 });
